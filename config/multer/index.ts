@@ -1,0 +1,1 @@
+export { default as multerUpload } from './multer.config';
