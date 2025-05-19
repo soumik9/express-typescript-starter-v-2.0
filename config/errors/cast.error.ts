@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { IErrorMessage } from '../../app';
+import { IErrorMessage } from '../../app/modules';
 
 const handleCastError = (error: mongoose.Error.CastError) => {
     const errors: IErrorMessage[] = [

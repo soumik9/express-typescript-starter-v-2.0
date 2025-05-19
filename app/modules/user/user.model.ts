@@ -2,8 +2,8 @@ import { Schema, model } from 'mongoose';
 import { NextFunction } from 'connect';
 import validator from "validator";
 import { IUser, IUserMethods } from './user.interface';
-import { comparePassword, generateHash } from '../../../libs';
 import { CommonSchema } from '../common';
+import { comparePassword, generateHash } from '../../../libs/heleprs';
 
 const UserSchema = new Schema<IUser, {}, IUserMethods>({
     firstName: {

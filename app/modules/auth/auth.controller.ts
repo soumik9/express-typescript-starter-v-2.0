@@ -1,7 +1,7 @@
 import { Request, RequestHandler, Response } from "express";
 import httpStatus from "http-status";
-import { catchAsync, sendResponse } from "../../../libs";
-import { ApiError } from "../../../config";
+import { catchAsync, sendResponse } from "../../../libs/heleprs";
+import { ApiError } from "../../../config/errors";
 
 // signin controller
 export const Signin: RequestHandler = catchAsync(

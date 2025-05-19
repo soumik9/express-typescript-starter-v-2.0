@@ -1,8 +1,8 @@
-import { NextFunction, Request, RequestHandler, Response } from "express";
-import { errorLogger } from "../../config/logger/log.config";
-import { IApiReponse } from "../../app";
 import path from "path";
 import moment from "moment";
+import { errorLogger } from "../../config";
+import { IApiReponse } from "../../app/modules";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 
 // *Catch async errors
 export const catchAsync = (fn: RequestHandler) =>
@@ -11,7 +11,7 @@ export const catchAsync = (fn: RequestHandler) =>
             await fn(req, res, next);
         } catch (error) {
             next(error);
-            errorLogger.error(error);
+            errorLogger.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
         }
     };
 
@@ -27,7 +27,6 @@ export const sendResponse = <T>(res: Response, data: IApiReponse<T>): void => {
 
     res.status(data.statusCode).json(responseData);
 };
-
 
 // *Get request full url
 export const getRequestFulllUrl = (req: Request) => {
@@ -53,4 +52,51 @@ export const getLocalFilePath = (relativePath: string) => {
 // *Get timestamp
 export const getCurrentTimestamp = (): string => {
     return moment().utc().format('YYYY-MM-DD HH:mm:ss');
+};
+
+// *Get data with pagination
+export const getPaginatedData = async (
+    queryModel: any, query = {}, page = 1, limit = 10, sort = { createdAt: -1 }, populate = ''
+) => {
+    // Convert string inputs to numbers if needed
+    const currentPage = parseInt(page as any) || 1;
+    const pageSize = parseInt(limit as any) || 10;
+
+    // Get total items count
+    const totalItems = await queryModel.countDocuments(query);
+
+    // Calculate total pages
+    const totalPages = Math.ceil(totalItems / pageSize);
+
+    // Execute query with pagination parameters
+    let dataQuery = queryModel.find(query)
+        .skip((currentPage - 1) * pageSize)
+        .limit(pageSize)
+        .sort(sort)
+        .lean();
+
+    // Apply populate if provided
+    if (populate) {
+        dataQuery = dataQuery.populate(populate);
+    }
+
+    // Get data
+    const data = await dataQuery;
+
+    // Calculate pagination flags
+    const hasNextPage = currentPage < totalPages;
+    const hasPreviousPage = currentPage > 1;
+
+    // Return data and metadata
+    return {
+        data,
+        meta: {
+            totalItems,
+            totalPages,
+            currentPage,
+            pageSize,
+            hasNextPage,
+            hasPreviousPage,
+        },
+    };
 };

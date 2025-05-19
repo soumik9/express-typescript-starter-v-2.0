@@ -1,5 +1,5 @@
 import path from "path";
-import { IUploadFile } from '../../app';
+import { IUploadFile } from '../../app/modules';
 import { errorLogger, infoLogger } from '../../config';
 import { promises as fsPromises, existsSync, mkdirSync } from 'fs';
 

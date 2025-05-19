@@ -1,12 +1,12 @@
-import { loadEnvironmentVariables, validateEnvVariables } from '../../libs';
+import { loadEnvironmentVariables, validateEnvVariables } from "../../libs/heleprs";
 
 // Load environment variables before defining config
 loadEnvironmentVariables();
 
 // Define required environment variables
 const requiredVariables = [
-    'PORT', 'NODE_ENV', 'BASE_URL',
-    'MONGODB_URI', 'MONGODB_DATABASE_NAME',
+    'PORT', 'NODE_ENV', 'BASE_URL', 'CLIENT_BASE_URL',
+    'MONGODB_URI', 'MONGODB_DATABASE_NAME', 'DEFAULT_ADMIN_PASSWORD', 'DEFAULT_ADMIN_EMAIL',
     'BCRYPT_SALT_ROUND', 'TOKEN_SECRET', 'TOKEN_SECRET_EXPIRES_IN',
     'EMAIL_ID', 'EMAIL_PASSWORD', 'EMAIL_HOST', 'EMAIL_PORT', 'EMAIL_NAME',
 ];
@@ -36,5 +36,16 @@ export const config = {
         PORT: process.env.EMAIL_PORT,
         NAME: process.env.EMAIL_NAME,
     },
-    BASE_URL: process.env.BASE_URL,
+
+    URL: {
+        BASE: process.env.BASE_URL,
+        CLIENT: process.env.CLIENT_BASE_URL,
+    },
+
+    SEEDER: {
+        DEFAULT_ADMIN: {
+            EMAIL: process.env.DEFAULT_ADMIN_EMAIL,
+            PASSWORD: process.env.DEFAULT_ADMIN_PASSWORD,
+        },
+    }
 };

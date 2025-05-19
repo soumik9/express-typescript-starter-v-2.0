@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import httpStatus from 'http-status';
 import { Request, Response } from 'express';
-import { getRequestFulllUrl } from '../../../libs';
+import { getRequestFulllUrl } from '../../../libs/heleprs';
 
 export const handleRouteNotFound = (req: Request, res: Response) => {
     const filePath = path.join(process.cwd(), 'public', 'html', 'NotFound.html');

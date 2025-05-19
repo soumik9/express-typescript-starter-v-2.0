@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
 import { errorLogger, infoLogger } from "../logger/log.config";
-import { getCurrentTimestamp } from "../../libs";
 import { config } from "./config.server";
+import { getCurrentTimestamp } from "../../libs/heleprs";
 
 // **Connect to MongoDB using Mongoose
 export const conntectToDatabase = async () => {

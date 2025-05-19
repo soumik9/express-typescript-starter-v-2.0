@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { IErrorMessage, IErrorResponse } from '../../app';
+import { IErrorMessage, IErrorResponse } from '../../app/modules';
 
 const handleValidationError = (
     error: mongoose.Error.ValidationError

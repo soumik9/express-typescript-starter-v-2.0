@@ -1,7 +1,9 @@
 import path from 'path';
-import { bootstrap, handleGlobalErrors } from './config';
-import { handleCheckPublicFileExists, handleRouteNotFound, MainRoutes, serverMiddlewares } from './app';
 import express, { Application, ErrorRequestHandler, NextFunction, Request, Response } from 'express';
+import { bootstrap, handleGlobalErrors } from './config';
+import { handleCheckPublicFileExists, serverMiddlewares } from './app/middleware';
+import { MainRoutes } from './app/routes';
+import { handleRouteNotFound } from './app/modules';
 
 const app: Application = express();
 

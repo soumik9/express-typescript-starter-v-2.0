@@ -3,7 +3,7 @@ import { Secret } from 'jsonwebtoken'
 import ApiError from "../../config/errors/api.error";
 import httpStatus from "http-status";
 import { config } from "../../config/server/config.server";
-import { verifyToken } from "../../libs";
+import { verifyToken } from "../../libs/heleprs";
 
 export default (...requiredPermissions: string[]) => async (req: Request, res: Response, next: NextFunction) => {
     try {

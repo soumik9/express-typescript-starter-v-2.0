@@ -4,10 +4,10 @@ import helmet from "helmet";
 // @ts-ignore
 import xss from 'xss-clean';
 import sanitize from 'express-mongo-sanitize';
-import { httpLogger, multerUpload } from '../../config';
 import { handleParseRequestBody } from './parser.middleware';
 import moment from 'moment';
-import { getRequestFulllUrl } from '../../libs';
+import { getRequestFulllUrl } from '../../libs/heleprs';
+import { httpLogger, multerUpload } from '../../config';
 
 const handleRequestLog = (req: Request, res: Response, next: NextFunction) => {
     const { method } = req;

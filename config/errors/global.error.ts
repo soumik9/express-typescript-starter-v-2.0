@@ -3,12 +3,12 @@ import { ZodError } from 'zod';
 import { MulterError } from 'multer';
 import httpStatus from 'http-status';
 import { config } from '../server';
-import { IErrorMessage } from '../../app';
 import handleValidationError from './validation.error';
 import handleZodError from './zod.error';
 import handleCastError from './cast.error';
 import ApiError from './api.error';
-import { getCurrentTimestamp } from '../../libs';
+import { IErrorMessage } from '../../app/modules';
+import { getCurrentTimestamp } from '../../libs/heleprs';
 
 const handleGlobalErrors: ErrorRequestHandler = (
     error, req: Request, res: Response, next: NextFunction

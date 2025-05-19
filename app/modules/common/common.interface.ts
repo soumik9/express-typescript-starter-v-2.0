@@ -65,3 +65,11 @@ export interface IMulterFiles {
     multiple?: IUploadFile[] | undefined;
     // You can define other fields here as needed
 }
+
+export interface ISendEmail {
+    toEmail: string;
+    fromEmail?: string;
+    subject: string;
+    template: string;
+    data: object;
+}
