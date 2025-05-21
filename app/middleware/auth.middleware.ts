@@ -1,32 +1,41 @@
 import { NextFunction, Request, Response } from "express";
-import { Secret } from 'jsonwebtoken'
+import { JwtPayload, Secret } from 'jsonwebtoken'
 import ApiError from "../../config/errors/api.error";
 import httpStatus from "http-status";
 import { config } from "../../config/server/config.server";
 import { verifyToken } from "../../libs/heleprs";
 
-export default (...requiredPermissions: string[]) => async (req: Request, res: Response, next: NextFunction) => {
+export default (...requiredRoles: string[]) => async (req: Request, res: Response, next: NextFunction) => {
     try {
+        // Extract and validate the Authorization header
         const authHeader = req.headers.authorization;
-        if (!authHeader) throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized access');
+        if (!authHeader || !authHeader.startsWith('Bearer '))
+            throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized access');
 
         // getting token
         const token = authHeader.split(' ')[1];
 
-        // verify token
-        let verifiedUser = null;
-        verifiedUser = verifyToken(token, config.TOKEN.SECRET as Secret);
+        // Verify the token and decode user data
+        const verifiedToken: JwtPayload = verifyToken(token, config.TOKEN.SECRET as Secret);
+        if (!verifiedToken || !verifiedToken._id)
+            throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid or expired token');
 
-        // const verifyDoc = await Admin.findById(verifiedUser._id).select("name").populate("role").lean();
-        // if (!verifyDoc)
-        //     throw new ApiError(httpStatus.UNAUTHORIZED, 'Please contact admin!');
+        // finding user
+        // const verifyDoc = await findUserAdminOrThrow({
+        //     query: { _id: verifiedToken._id }, isItemShouldExist: true, filterWithDto: false
+        // }) as IUserAdmin;
 
-        // const loggedUserRole = verifyDoc.role as IRole;
-        // const loggedUserPermissions = loggedUserRole.permissions;
-        // req.user = verifiedUser;  // email, _id, business
+        // check if user is blocked
+        // if (verifyDoc.is_blocked)
+        //     throw new ApiError(httpStatus.UNAUTHORIZED, 'Your account is blocked!');
+
+        // assign user data to req object
+        // req.user = {
+        //     _id: verifiedToken._id, email: verifyDoc.email, role: verifyDoc.role, name: verifyDoc.name,
+        // };
 
         // If any of the required permissions are missing, throw Forbidden error
-        // if (requiredPermissions.length && !requiredPermissions.some(permission => loggedUserPermissions.includes(permission)))
+        // if (requiredRoles.length && !requiredRoles.includes(verifyDoc.role))
         //     throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
 
         next();

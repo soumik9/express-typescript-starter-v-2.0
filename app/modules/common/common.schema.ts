@@ -3,11 +3,11 @@ import { Schema } from "mongoose";
 
 // Common schema for common fields
 export const CommonSchema = new Schema({
-    createdAt: {
+    created_at: {
         type: Number,
         default: () => moment().utc().unix(),
     },
-    updatedAt: {
+    updated_at: {
         type: Number,
         default: () => moment().utc().unix(),
     },
@@ -19,9 +19,9 @@ CommonSchema.statics.isExistsById = async function (id: string, select: string) 
 };
 
 CommonSchema.pre("save", function (next) {
-    this.updatedAt = moment().utc().unix();
+    this.updated_at = moment().utc().unix();
     if (this.isNew) {
-        this.createdAt = moment().utc().unix();
+        this.created_at = moment().utc().unix();
     }
     next();
 });
@@ -30,7 +30,7 @@ CommonSchema.pre("save", function (next) {
 CommonSchema.pre(
     ["updateOne", "findOneAndUpdate", "updateMany"],
     function (next) {
-        this.set({ updatedAt: moment().utc().unix() });
+        this.set({ updated_at: moment().utc().unix() });
         next();
     }
 );

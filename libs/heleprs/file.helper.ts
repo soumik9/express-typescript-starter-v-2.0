@@ -1,7 +1,9 @@
 import path from "path";
 import { IUploadFile } from '../../app/modules';
-import { errorLogger, infoLogger } from '../../config';
+import { config, errorLogger, infoLogger } from '../../config';
 import { promises as fsPromises, existsSync, mkdirSync } from 'fs';
+import { FnFileReturnTypeEnum } from "../enums";
+import { defaultImagePath } from "../constant";
 
 // *moveFilesToSpecificFolder function
 export const moveFilesToSpecificFolder = async (sourcePaths: string | string[], destinationFolder: string): Promise<string | string[]> => {
@@ -52,7 +54,9 @@ export const moveFilesToSpecificFolder = async (sourcePaths: string | string[], 
  */
 
 // *extractFilePaths function
-export const extractFilePaths = async <T extends 'single' | 'multiple'>(files: any, type: T): Promise<T extends 'single' ? string | undefined : string[]> => {
+export const extractFilePaths = async <T extends FnFileReturnTypeEnum.Single | FnFileReturnTypeEnum.Multiple>(
+    files: any, type: T
+): Promise<T extends 'single' ? string | undefined : string[]> => {
     // Early return for empty files object
     if (!files || Object.keys(files).length === 0) {
         return (type === 'single' ? undefined : []) as any;
@@ -123,3 +127,29 @@ export const deleteFileFromLocal = async (filePaths: string | string[]): Promise
     '/path/to/file2.pdf'
     ]);
  */
+
+// *Get documents full path
+export const getDocumentsFullPath = <T extends FnFileReturnTypeEnum>(
+    paths: T extends FnFileReturnTypeEnum.Single ? string | undefined : string[] | undefined, type: T
+): T extends FnFileReturnTypeEnum.Single ? string : string[] => {
+
+    const baseUrl = config.URL.BASE;
+    const defaultUrl: string = `${config.URL.BASE}/${defaultImagePath}`;
+
+    if (type === FnFileReturnTypeEnum.Single) {
+        if (!paths) {
+            return defaultUrl as any;
+        }
+
+        // For single type, ensure paths is a string
+        const path = paths as string;
+        return `${baseUrl}/${path}` as any;
+    } else {
+        // For multiple type, ensure paths is an array
+        if (!Array.isArray(paths)) {
+            return [defaultUrl] as any;
+        }
+        const pathArray = Array.isArray(paths) ? paths : [paths as string];
+        return pathArray.map(path => `${baseUrl}/${path}`) as any;
+    }
+};

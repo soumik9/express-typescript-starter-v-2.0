@@ -10,3 +10,8 @@ export enum ENUM_USER_STATUS {
     DECLINED = 'declined',
     APPROVED = 'approved',
 }
+
+export enum FnFileReturnTypeEnum {
+    Single = 'single',
+    Multiple = 'multiple',
+}

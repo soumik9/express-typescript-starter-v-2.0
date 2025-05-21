@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction, RequestHandler } from 'express';
 import httpStatus from 'http-status';
-import { ApiError, config, errorLogger } from '../../config';
+import { config, errorLogger, infoLogger } from '../../config';
+import { Request, Response, NextFunction, RequestHandler } from 'express';
 
 // *parseRequestBody middleware*
 export const handleParseRequestBody: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
@@ -19,6 +19,7 @@ export const handleParseRequestBody: RequestHandler = (req: Request, res: Respon
 
             // Merge parsed data with existing body
             req.body = { ...req.body, ...parsedData };
+            infoLogger.info(`URL: ${req.originalUrl}, BODY: ${JSON.stringify(parsedData)}`); // Log the original body
             delete req.body.data;
         }
         next();
@@ -52,54 +53,24 @@ export const handleParseRequestBody: RequestHandler = (req: Request, res: Respon
     }
 };
 
-// *parseQueryData function*
-export const handleParseQuery = <T extends Record<string, any>>(
-    query: Record<string, any>,
-    options: {
-        defaults?: Partial<T>;
-        transforms?: Record<string, (value: any) => any>;
-        required?: Array<keyof T>;
-    } = {}
-): T => {
-    const { defaults = {}, transforms = {}, required = [] } = options;
-    const result = { ...defaults } as T;
+// *parseQueryData function
+export const handleParseQuery = (query: any): {
+    page: number; limit: number;
+    [key: string]: string | number;
+} => {
 
-    // Process all query parameters
-    for (const [key, value] of Object.entries(query)) {
-        if (value === undefined || value === null) continue;
+    //pagination
+    const page = query.page ? parseInt(query.page as string, 10) : 1;
+    const limit = query.limit ? parseInt(query.limit as string, 10) : 999999;
 
-        const k = key as keyof T;
-        // Use type assertion with a simpler check
-        const transform = transforms[key];
+    const user_id = query.user_id ? query.user_id.toString() : null;
+    const email = query.email ? query.email.toString() : null;
 
-        if (typeof transform === 'function')
-            result[k] = transform(value);
-        else
-            result[k] = value;
+    return {
+        page,
+        limit,
+
+        user_id,
+        email,
     }
-
-    // Validate required fields
-    for (const field of required) {
-        if (result[field] === undefined)
-            throw new ApiError(httpStatus.NOT_FOUND, `Missing required query parameter: ${String(field)}`);
-    }
-
-    return result;
-};
-
-// Example usage:
-/*
- Using with your current parameters
-const { page, limit, user_id } = parseQueryData(req.query, {
-    defaults: {
-        page: 1,
-        limit: 999999,
-        user_id: null,
-    },
-    transforms: {
-        page: (v) => parseInt(v, 10),
-        limit: (v) => parseInt(v, 10),
-        user_id: (v) => v?.toString(),
-    }
-});
-*/
+}

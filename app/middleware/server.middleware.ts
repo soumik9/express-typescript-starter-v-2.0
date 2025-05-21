@@ -34,8 +34,6 @@ export const serverMiddlewares = (app: Application) => {
     app.use(helmet({
         crossOriginResourcePolicy: { policy: 'cross-origin' },
     }));
-    app.use(handleRequestLog);
-    app.use(handleParseRequestBody);
 
     // multer configure
     app.use(
@@ -45,5 +43,7 @@ export const serverMiddlewares = (app: Application) => {
         ])
     );
 
+    app.use(handleRequestLog);
+    app.use(handleParseRequestBody);
 };
 
