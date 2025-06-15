@@ -9,8 +9,8 @@ export class UserDto implements Partial<IUser> {
     phone: string;
     image?: string;
     email: string;
-    createdAt: number | undefined;
-    updatedAt: number | undefined;
+    created_at: number | undefined;
+    updated_at: number | undefined;
 
     constructor(user: IUser) {
         this._id = user._id!;
@@ -19,8 +19,8 @@ export class UserDto implements Partial<IUser> {
         this.phone = user.phone;
         this.image = user.image;
         this.email = user.email;
-        this.createdAt = user.createdAt;
-        this.updatedAt = user.updatedAt;
+        this.created_at = user.created_at;
+        this.updated_at = user.updated_at;
     }
 }
 
