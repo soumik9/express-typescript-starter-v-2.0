@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
  * dont use from config env file, because it may not be defined yet
  */
 
-// *Load environment variables from .env files based on the current environment
+// @helper: Load environment variables from .env files based on the current environment
 export const loadEnvironmentVariables = (): void => {
     const NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -40,7 +40,7 @@ export const loadEnvironmentVariables = (): void => {
     }
 };
 
-// * Validate required environment variables
+// @helper: Validate required environment variables
 export const validateEnvVariables = (requiredVars: string[]): void => {
     const missing = requiredVars.filter(varName => !process.env[varName]);
 

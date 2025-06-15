@@ -1,7 +1,7 @@
 import jwt, { JwtPayload, Secret } from 'jsonwebtoken'
 import { config } from '../../config';
 
-// *generate token
+// @helper: generate token
 export const generateToken = (data: any): String => {
 
     const payload = {
@@ -16,7 +16,7 @@ export const generateToken = (data: any): String => {
     return token;
 };
 
-// *verify token
+// @helper: verify token
 export const verifyToken = (token: string, secret: Secret): JwtPayload => {
     return jwt.verify(token, secret) as JwtPayload;
 };

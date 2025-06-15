@@ -52,25 +52,3 @@ export const handleParseRequestBody: RequestHandler = (req: Request, res: Respon
         return; // void return
     }
 };
-
-// *parseQueryData function
-export const handleParseQuery = (query: any): {
-    page: number; limit: number;
-    [key: string]: string | number;
-} => {
-
-    //pagination
-    const page = query.page ? parseInt(query.page as string, 10) : 1;
-    const limit = query.limit ? parseInt(query.limit as string, 10) : 999999;
-
-    const user_id = query.user_id ? query.user_id.toString() : null;
-    const email = query.email ? query.email.toString() : null;
-
-    return {
-        page,
-        limit,
-
-        user_id,
-        email,
-    }
-}

@@ -5,7 +5,7 @@ import { promises as fsPromises, existsSync, mkdirSync } from 'fs';
 import { FnFileReturnTypeEnum } from "../enums";
 import { defaultImagePath } from "../constant";
 
-// *moveFilesToSpecificFolder function
+// @helper: moveFilesToSpecificFolder function
 export const moveFilesToSpecificFolder = async (sourcePaths: string | string[], destinationFolder: string): Promise<string | string[]> => {
     try {
         // Normalize inputs
@@ -53,7 +53,7 @@ export const moveFilesToSpecificFolder = async (sourcePaths: string | string[], 
     // Returns: ["public/images/gallery/image1.jpg", "public/images/gallery/image2.jpg"]
  */
 
-// *extractFilePaths function
+// @helper: extractFilePaths function
 export const extractFilePaths = async <T extends FnFileReturnTypeEnum.Single | FnFileReturnTypeEnum.Multiple>(
     files: any, type: T
 ): Promise<T extends 'single' ? string | undefined : string[]> => {
@@ -93,7 +93,7 @@ export const extractFilePaths = async <T extends FnFileReturnTypeEnum.Single | F
     // Returns: string[]
  */
 
-// *deleteFileFromLocal function
+// @helper: deleteFileFromLocal function
 export const deleteFileFromLocal = async (filePaths: string | string[]): Promise<void> => {
 
     // Normalize input to array
@@ -128,7 +128,7 @@ export const deleteFileFromLocal = async (filePaths: string | string[]): Promise
     ]);
  */
 
-// *Get documents full path
+// @helper: Get documents full path
 export const getDocumentsFullPath = <T extends FnFileReturnTypeEnum>(
     paths: T extends FnFileReturnTypeEnum.Single ? string | undefined : string[] | undefined, type: T
 ): T extends FnFileReturnTypeEnum.Single ? string : string[] => {

@@ -6,10 +6,10 @@ import { getCurrentTimestamp } from "./global.helper";
 import { ISendEmail } from "../../app/modules";
 import { config, transporter, infoLogger, ApiError } from "../../config";
 
-// *Add template caching mechanism
+// @helper: Add template caching mechanism
 const templateCache: Record<string, HandlebarsTemplateDelegate> = {};
 
-// *Render template
+// @helper: Render template
 export const renderTemplate = (templateName: string, data: object) => {
     // Check if template is already cached
     if (!templateCache[templateName]) {
@@ -28,7 +28,7 @@ export const renderTemplate = (templateName: string, data: object) => {
 // Verify once at startup or periodically, not for every email
 let transporterVerified = false;
 
-// *Send mail
+// @helper: Send mail
 export const sendEmail = async (payload: ISendEmail) => {
     const { toEmail, subject, template, data, fromEmail } = payload;
 

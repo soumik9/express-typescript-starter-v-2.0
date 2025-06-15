@@ -30,6 +30,15 @@ export type IErrorResponse = {
     errorMessages: IErrorMessage[];
 };
 
+export interface IApiResponseMeta {
+    totalItems: number;
+    totalPages: number;
+    currentPage: number;
+    pageSize: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+};
+
 export interface IApiReponse<T> {
     statusCode: number;
     success: boolean;
