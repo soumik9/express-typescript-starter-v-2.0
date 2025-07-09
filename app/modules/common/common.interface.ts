@@ -3,8 +3,8 @@ import { Types } from "mongoose";
 // common schema
 export interface ICommonSchema {
     _id?: string | Types.ObjectId;
-    created_at?: number;
-    updated_at?: number;
+    createdAt?: number;
+    updatedAt?: number;
     __v?: number;
 }
 

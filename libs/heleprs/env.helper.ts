@@ -7,8 +7,16 @@ import dotenv from 'dotenv';
  * dont use from config env file, because it may not be defined yet
  */
 
-// @helper: Load environment variables from .env files based on the current environment
+// @desc: Load environment variables from .env files based on the current environment
 export const loadEnvironmentVariables = (): void => {
+    // Load the default .env file first to initialize NODE_ENV
+    const defaultEnvPath = path.join(process.cwd(), '.env');
+    if (fs.existsSync(defaultEnvPath)) {
+        dotenv.config({ path: defaultEnvPath });
+        console.log('Loaded default environment configuration from .env');
+    }
+
+    // Now determine the NODE_ENV value (default to 'development' if not set)
     const NODE_ENV = process.env.NODE_ENV || 'development';
 
     // Determine which env file to use based on environment
@@ -22,23 +30,18 @@ export const loadEnvironmentVariables = (): void => {
     const envFile = envFiles[NODE_ENV as keyof typeof envFiles] || '.env.local';
     const envPath = path.join(process.cwd(), envFile);
 
-    // Check if the environment file exists
+    // Check if the environment-specific file exists
     if (!fs.existsSync(envPath)) {
-        const defaultEnvPath = path.join(process.cwd(), '.env');
-
-        // Fall back to default .env if specific environment file doesn't exist
-        if (fs.existsSync(defaultEnvPath)) {  // Fixed: using fs.existsSync instead of fstat.existsSync
-            dotenv.config({ path: defaultEnvPath });
+        if (fs.existsSync(defaultEnvPath))
             console.warn(`Environment file ${envFile} not found, using default .env file`);
-        } else {
+        else
             console.warn(`No environment files found. Using process.env values only.`);
-        }
     } else {
-        // Load the environment-specific file
-        dotenv.config({ path: envPath });
+        dotenv.config({ path: envPath }); // Load the environment-specific file
         console.log(`Loaded environment configuration from ${envFile}`);
     }
 };
+
 
 // @helper: Validate required environment variables
 export const validateEnvVariables = (requiredVars: string[]): void => {
