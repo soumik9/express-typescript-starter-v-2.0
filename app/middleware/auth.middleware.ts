@@ -1,11 +1,10 @@
-import { NextFunction, Request, Response } from "express";
-import { JwtPayload, Secret } from 'jsonwebtoken'
-import ApiError from "../../config/errors/api.error";
 import httpStatus from "http-status";
-import { config } from "../../config/server/config.server";
+import { ApiError, config } from "../../config";
 import { verifyToken } from "../../libs/heleprs";
+import { JwtPayload, Secret } from 'jsonwebtoken'
+import { NextFunction, Request, Response } from "express";
 
-export default (...requiredRoles: string[]) => async (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware = (...requiredRoles: string[]) => async (req: Request, res: Response, next: NextFunction) => {
     try {
         // Extract and validate the Authorization header
         const authHeader = req.headers.authorization;

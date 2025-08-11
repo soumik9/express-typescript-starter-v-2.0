@@ -43,5 +43,4 @@ AdminSchema.pre("save", async function (next) {
     next();
 });
 
-const Admin = model<IAdmin>("Admin", AdminSchema);
-export default Admin;
+export const Admin = model<IAdmin>("Admin", AdminSchema);

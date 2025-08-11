@@ -3,8 +3,8 @@ import { Types } from "mongoose";
 // common schema
 export interface ICommonSchema {
     _id?: string | Types.ObjectId;
-    createdAt?: number;
-    updatedAt?: number;
+    created_at?: number;
+    updated_at?: number;
     __v?: number;
 }
 
@@ -43,12 +43,7 @@ export interface IApiReponse<T> {
     statusCode: number;
     success: boolean;
     message?: string | null;
-    meta?: {
-        page?: number;
-        limit?: number;
-        showingTotal?: number;
-        total: number;
-    };
+    meta?: IApiResponseMeta;
     data?: T | null;
 };
 

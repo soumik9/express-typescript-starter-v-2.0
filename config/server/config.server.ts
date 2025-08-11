@@ -6,9 +6,10 @@ loadEnvironmentVariables();
 // Define required environment variables
 const requiredVariables = [
     // 'PORT', 'NODE_ENV', 'BCRYPT_SALT_ROUND',
+    "BASE_URL", "CLIENT_BASE_URL",
     'MONGODB_URI', 'MONGODB_DATABASE_NAME',
     'TOKEN_SECRET', 'TOKEN_SECRET_EXP',
-    'SEED_ADMIN_PHONE', 'SEED_ADMIN_PASSWORD', 'SEED_ADMIN_ROLE'
+    'DEFAULT_ADMIN_PHONE', 'DEFAULT_ADMIN_PASSWORD', 'DEFAULT_ADMIN_ROLE'
 ];
 
 // Validate environment variables
@@ -30,6 +31,11 @@ export const config = {
         NAME: process.env.MONGODB_DATABASE_NAME,
     },
 
+    URL: {
+        BASE: process.env.BASE_URL,
+        CLIENT: process.env.CLIENT_BASE_URL,
+    },
+
     MAIL: {
         ID: process.env.EMAIL_ID,
         PASSWORD: process.env.EMAIL_PASSWORD,
@@ -40,9 +46,9 @@ export const config = {
 
     SEEDER: {
         DEFAULT_ADMIN: {
-            PHONE: process.env.SEED_ADMIN_PHONE,
-            PASSWORD: process.env.SEED_ADMIN_PASSWORD,
-            ROLE: process.env.SEED_ADMIN_ROLE,
+            PHONE: process.env.DEFAULT_ADMIN_PHONE,
+            PASSWORD: process.env.DEFAULT_ADMIN_PASSWORD,
+            ROLE: process.env.DEFAULT_ADMIN_ROLE,
         },
     }
 };

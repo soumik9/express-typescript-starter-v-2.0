@@ -1,14 +1,14 @@
-import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
-import { MulterError } from 'multer';
-import httpStatus from 'http-status';
 import { config } from '../server';
-import handleValidationError from './validation.error';
+import ApiError from './api.error';
+import httpStatus from 'http-status';
+import { MulterError } from 'multer';
 import handleZodError from './zod.error';
 import handleCastError from './cast.error';
-import ApiError from './api.error';
 import { IErrorMessage } from '../../app/modules';
+import handleValidationError from './validation.error';
 import { getCurrentTimestamp } from '../../libs/heleprs';
+import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 
 const handleGlobalErrors: ErrorRequestHandler = (
     error, req: Request, res: Response, next: NextFunction
@@ -73,10 +73,10 @@ const handleGlobalErrors: ErrorRequestHandler = (
 
     // Return standardized error response
     return res.json({
-        statusCode,
+        status_code: statusCode,
         success: false,
         message,
-        errorMessages,
+        error_messages: errorMessages,
         stack: config.ENV !== 'production' ? error?.stack : undefined,
         timestamp: getCurrentTimestamp(),
         path: req.originalUrl || '',
