@@ -1,31 +1,26 @@
-import { User } from "../../app/modules";
+import { Admin } from "../../app/modules";
 import { config, errorLogger, infoLogger } from "../../config";
-import { defaultImagePath } from "../constant";
-import { ENUM_ROLE, ENUM_USER_STATUS } from "../enums";
 
 export const seedDefaultAdmin = async () => {
     try {
 
-        const adminSedderData = {
+        const adminSeederData = {
             name: "Admin",
-            email: config.SEEDER.DEFAULT_ADMIN.EMAIL,
+            phone: config.SEEDER.DEFAULT_ADMIN.PHONE,
             password: config.SEEDER.DEFAULT_ADMIN.PASSWORD,
-            role: ENUM_ROLE.ADMIN,
-            phone: "+8801689201370",
+            role: config.SEEDER.DEFAULT_ADMIN.ROLE,
             country: {
                 code: "BD",
                 name: "Bangladesh",
                 dial_code: "+880",
             },
-            image: defaultImagePath,
-            status: ENUM_USER_STATUS.APPROVED,
         };
 
-        const adminExists = await User.findOne({ email: adminSedderData.email });
+        const adminExists = await Admin.findOne({ phone: adminSeederData.phone });
         if (!adminExists) {
-            const admin = new User(adminSedderData);
+            const admin = new Admin(adminSeederData);
             await admin.save({ validateBeforeSave: false });
-            infoLogger.warn("Admin data seeded successfully.");
+            infoLogger.info("Admin data seeded successfully.");
         } else
             console.log("Admin data already exists.");
     } catch (error) {

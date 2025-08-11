@@ -1,6 +1,6 @@
 import { promises as fsPromises } from "fs";
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import { getLocalFilePath, getLocalRootPath } from "../../libs/heleprs";
+import { getLocalFilePath, getLocalRootPath } from "../../libs/helpers";
 import { config } from "../../config";
 
 export const handleCheckPublicFileExists: RequestHandler = async (

@@ -77,3 +77,9 @@ export interface ISendEmail {
     template: string;
     data: object;
 }
+
+export interface IPhoneCountry {
+    code?: string;      // e.g., "US", "UK", "IN"
+    name: string;      // e.g., "United States", "United Kingdom"
+    dial_code: string;  // e.g., "+1", "+44", "+91"
+}

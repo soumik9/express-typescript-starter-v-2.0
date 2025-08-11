@@ -1,9 +1,8 @@
 import mongoose from "mongoose"
-import { errorLogger, infoLogger } from "../logger/log.config";
 import { config } from "./config.server";
-import { getCurrentTimestamp } from "../../libs/heleprs";
+import { errorLogger, infoLogger } from "../logger/log.config";
 
-// **Connect to MongoDB using Mongoose
+// @server: Connect to MongoDB using Mongoose
 export const conntectToDatabase = async () => {
     const uri = `${config.DATABASE.MONGO_URI}/${config.DATABASE.NAME}`;
     try {
@@ -11,10 +10,10 @@ export const conntectToDatabase = async () => {
 
         // Set up connection event listeners
         mongoose.connection.on('error', (err) => errorLogger.error(`MongoDB connection error: ${err}`));
-        mongoose.connection.on('disconnected', () => infoLogger.warn(`MongoDB disconnected at ${getCurrentTimestamp()}`));
-        mongoose.connection.on('reconnected', () => infoLogger.info(`MongoDB reconnected at ${getCurrentTimestamp()}`));
+        mongoose.connection.on('disconnected', () => infoLogger.warn(`MongoDB disconnected: ${config.DATABASE.NAME}`));
+        mongoose.connection.on('reconnected', () => infoLogger.info(`MongoDB reconnected: ${config.DATABASE.NAME}`));
 
-        infoLogger.info(`Connected to MongoDB: ${config.DATABASE.NAME} at ${getCurrentTimestamp()}`);
+        infoLogger.info(`Connected to MongoDB: ${config.DATABASE.NAME}`);
         return mongoose.connection;
     } catch (error) {
         errorLogger.error(`Database connection failed: ${error instanceof Error ? error.message : 'unknown'}`);
@@ -22,22 +21,21 @@ export const conntectToDatabase = async () => {
     }
 };
 
-// **Disconnect from MongoDB using Mongoose
+// @server: Disconnect from MongoDB using Mongoose
 export const disconnectFromDatabase = async (): Promise<void> => {
     try {
         if (mongoose.connection.readyState === 1) { // 1 = connected
             await mongoose.connection.close();
             infoLogger.info("MongoDB connection closed gracefully");
-        } else {
+        } else
             infoLogger.info("No active MongoDB connection to close");
-        }
     } catch (error) {
         errorLogger.error(`Error closing database connection: ${error instanceof Error ? error.message : String(error)}`);
         throw error; // Propagate error for handling in the calling function
     }
 };
 
-// **Get current connection state as a readable string
+// @server: Get current connection state as a readable string
 export const getConnectionStateName = (): string => {
     const states = {
         0: 'disconnected',
@@ -49,7 +47,7 @@ export const getConnectionStateName = (): string => {
     return states[mongoose.connection.readyState] || 'unknown';
 };
 
-// **Get current database connection information
+// @server: Get current database connection information
 export const getDatabaseInfo = ({ username = '' }): Record<string, any> => {
     const connection = mongoose.connection;
     return {

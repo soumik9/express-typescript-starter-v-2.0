@@ -1,4 +1,4 @@
-import { loadEnvironmentVariables, validateEnvVariables } from "../../libs/heleprs";
+import { loadEnvironmentVariables, validateEnvVariables } from "../../libs/helpers";
 
 // Load environment variables before defining config
 loadEnvironmentVariables();
@@ -42,6 +42,7 @@ export const config = {
         HOSTNAME: process.env.EMAIL_HOST,
         PORT: process.env.EMAIL_PORT,
         NAME: process.env.EMAIL_NAME,
+        FROM: process.env.EMAIL_FROM,
     },
 
     SEEDER: {

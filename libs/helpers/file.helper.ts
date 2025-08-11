@@ -1,9 +1,9 @@
 import path from "path";
+import { defaultImagePath } from "../constant";
+import { FnFileReturnTypeEnum } from "../enums";
 import { IUploadFile } from '../../app/modules';
 import { config, errorLogger, infoLogger } from '../../config';
 import { promises as fsPromises, existsSync, mkdirSync } from 'fs';
-import { FnFileReturnTypeEnum } from "../enums";
-import { defaultImagePath } from "../constant";
 
 // @helper: moveFilesToSpecificFolder function
 export const moveFilesToSpecificFolder = async (sourcePaths: string | string[], destinationFolder: string): Promise<string | string[]> => {

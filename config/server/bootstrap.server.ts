@@ -6,7 +6,7 @@ import { handleProcessError } from "../errors";
 import { shutdownServerGracefully } from "./shutdown.server";
 import { conntectToDatabase } from "./database.server";
 
-// **Bootstrap the server and handle errors gracefully
+// @server: Bootstrap the server and handle errors gracefully
 export const bootstrap = async (app: Application): Promise<Server> => {
     // Track server instance for graceful shutdown
     let server: Server;
@@ -32,11 +32,11 @@ export const bootstrap = async (app: Application): Promise<Server> => {
     }
 };
 
-// **Start the server and return the server instance
+// @server: Start the server and return the server instance
 const startServer = (app: Application): Promise<Server> => {
     return new Promise((resolve) => {
         const server = app.listen(config.PORT, () => {
-            infoLogger.info(`Server running at http://localhost:${config.PORT}`);
+            infoLogger.info(`Server running at: ${config.URL.BASE}`);
             resolve(server);
         });
     });

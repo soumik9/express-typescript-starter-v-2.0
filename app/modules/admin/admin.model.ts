@@ -1,7 +1,8 @@
 import { model, Schema } from "mongoose";
-import { IAdmin, IAdminMethods } from "./admin.interface";
-import { comparePassword, generateHash } from "../../../libs/heleprs";
 import { CommonSchema } from "../common";
+import { IAdmin, IAdminMethods } from ".";
+import { AdminRoleEnum } from "../../../libs/enums";
+import { compareHash, generateHash } from "../../../libs/helpers";
 
 const AdminSchema = new Schema<IAdmin, {}, IAdminMethods>({
     name: {
@@ -13,14 +14,32 @@ const AdminSchema = new Schema<IAdmin, {}, IAdminMethods>({
         required: [true, 'Phone number is required'],
         unique: true,
     },
+    country: {
+        code: {
+            type: String,
+            required: [true, 'Country code is required'],
+        },
+        name: {
+            type: String,
+            required: [true, 'Country name is required'],
+        },
+        dial_code: {
+            type: String,
+            required: [true, 'Country dial code is required'],
+        },
+    },
     password: {
         type: String,
         required: [true, 'Password is required'],
     },
     role: {
         type: String,
-        default: "admin",
-    },
+        enum: {
+            values: Object.values(AdminRoleEnum),
+            message: 'Invalid role type, must be one of: ' + Object.values(AdminRoleEnum).join(', '),
+        },
+        required: [true, 'Role type is required'],
+    }
 });
 
 // Inherit from CommonSchema
@@ -28,7 +47,7 @@ AdminSchema.add(CommonSchema);
 
 // Method to verify if the password matches
 AdminSchema.methods.isPasswordMatched = async function (givenPassword: string): Promise<boolean> {
-    return await comparePassword(givenPassword, this.password);
+    return await compareHash(givenPassword, this.password);
 };
 
 // Pre-save hook for hashing password before saving

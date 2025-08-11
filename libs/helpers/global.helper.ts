@@ -48,8 +48,3 @@ export const getLocalFilePath = (relativePath: string) => {
     const normalizedPath = path.normalize(relativePath).replace(/^(\.\.(\/|\\|$))+/, '');
     return path.join(getLocalRootPath(), normalizedPath);
 }
-
-// @helper: Get timestamp
-export const getCurrentTimestamp = (): string => {
-    return moment().utc().format('YYYY-MM-DD HH:mm:ss');
-};

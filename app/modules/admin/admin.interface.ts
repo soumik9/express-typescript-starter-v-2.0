@@ -1,11 +1,13 @@
 import { Model } from "mongoose";
-import { ICommonSchema } from "../common";
+import { ICommonSchema, IPhoneCountry } from "../common";
+import { AdminRoleEnum } from "../../../libs/enums";
 
 export interface IAdmin extends ICommonSchema {
     name: string;
     phone: string;
     password: string;
-    role: 'admin';
+    role: AdminRoleEnum;
+    country: IPhoneCountry; // code, name, dial_code
 }
 
 // admin schema methods

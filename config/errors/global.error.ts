@@ -7,7 +7,7 @@ import handleZodError from './zod.error';
 import handleCastError from './cast.error';
 import { IErrorMessage } from '../../app/modules';
 import handleValidationError from './validation.error';
-import { getCurrentTimestamp } from '../../libs/heleprs';
+import { getCurrentTimestamp } from '../../libs/helpers';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 
 const handleGlobalErrors: ErrorRequestHandler = (

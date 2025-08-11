@@ -1,6 +1,6 @@
-import { NextFunction, Request, Response } from 'express';
-import { AnyZodObject, ZodEffects } from 'zod';
 import { errorLogger } from '../../config';
+import { AnyZodObject, ZodEffects } from 'zod';
+import { NextFunction, Request, Response } from 'express';
 
 export const zodRequestValidator = (schema: AnyZodObject | ZodEffects<AnyZodObject>) =>
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {

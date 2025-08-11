@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 import handlebars from "handlebars";
 import httpStatus from "http-status";
-import { getCurrentTimestamp } from "./global.helper";
 import { ISendEmail } from "../../app/modules";
 import { config, transporter, infoLogger, ApiError } from "../../config";
 
@@ -30,6 +29,7 @@ let transporterVerified = false;
 
 // @helper: Send mail
 export const sendEmail = async (payload: ISendEmail) => {
+
     const { toEmail, subject, template, data, fromEmail } = payload;
 
     // Step 1: Check if the email is valid
@@ -48,17 +48,15 @@ export const sendEmail = async (payload: ISendEmail) => {
         if (!transporterVerified) {
             await transporter.verify();
             transporterVerified = true;
-            infoLogger.info(`Server is ready to take our messages: ${getCurrentTimestamp()}`);
+            infoLogger.info(`Server is ready to take our messages`);
         }
 
         const htmlContent = renderTemplate(template, data);
-
         if (!htmlContent)
             throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Template not found");
 
-
         const response = await transporter.sendMail({
-            from: fromEmail ? fromEmail : config.MAIL.ID,
+            from: fromEmail ? fromEmail : config.MAIL.FROM,
             to: toEmail,
             subject: subject,
             html: htmlContent,
@@ -67,6 +65,9 @@ export const sendEmail = async (payload: ISendEmail) => {
         infoLogger.info(`Message sent: ${toEmail} with ID: ${response.messageId}`);
         return response;
     } catch (error) {
-        throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, `Failed to send email: ${error instanceof Error ? error.message : 'unknown'}`);
+        throw new ApiError(
+            httpStatus.INTERNAL_SERVER_ERROR,
+            `Failed to send email: ${error instanceof Error ? error.message : 'unknown'}`
+        );
     }
 };

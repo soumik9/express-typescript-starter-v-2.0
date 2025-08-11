@@ -1,8 +1,8 @@
 import bcrypt from 'bcrypt';
 import { config } from '../../config';
 
-// @helper: comparePassword function
-export const comparePassword = async (comparableString: string, hashValue: string): Promise<boolean> => {
+// @helper: compareHash function
+export const compareHash = async (comparableString: string, hashValue: string): Promise<boolean> => {
     const isMatched = await bcrypt.compare(comparableString, hashValue);
     return isMatched;
 };

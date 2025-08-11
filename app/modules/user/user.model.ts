@@ -3,7 +3,7 @@ import { NextFunction } from 'connect';
 import validator from "validator";
 import { IUser, IUserMethods } from './user.interface';
 import { CommonSchema } from '../common';
-import { comparePassword, generateHash } from '../../../libs/heleprs';
+import { comparePassword, generateHash } from '../../../libs/helpers';
 
 const UserSchema = new Schema<IUser, {}, IUserMethods>({
     firstName: {
