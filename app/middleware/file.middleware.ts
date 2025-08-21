@@ -1,7 +1,8 @@
+import { config } from "../../config";
 import { promises as fsPromises } from "fs";
+import { ServerEnvironmentEnum } from "../../libs/enums";
 import { Request, Response, NextFunction, RequestHandler } from "express";
 import { getLocalFilePath, getLocalRootPath } from "../../libs/helpers";
-import { config } from "../../config";
 
 export const handleCheckPublicFileExists: RequestHandler = async (
     req: Request, res: Response, next: NextFunction
@@ -34,12 +35,15 @@ export const handleCheckPublicFileExists: RequestHandler = async (
     } catch (error) {
         // File does not exist or cannot be accessed
         res.status(404).json({
+            status_code: 404,
             success: false,
             message: "File Not Found",
-            errorMessages: [{
-                path: config.ENV === 'production' ? '' : req.originalUrl,  // Only expose path in non-production
+            error_messages: [{
+                path: config.ENV === ServerEnvironmentEnum.Production ? '' : req.originalUrl,  // Only expose path in non-production
                 message: "Image not found or has been deleted."
-            }]
+            }],
+            stack: config.ENV !== ServerEnvironmentEnum.Production ? null : undefined,
+            path: req.originalUrl || '',
         });
         return; // void return, not returning res.status().json()
     }

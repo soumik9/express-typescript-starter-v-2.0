@@ -1,4 +1,4 @@
-import { loadEnvironmentVariables, validateEnvVariables } from "../../libs/helpers";
+import { loadEnvironmentVariables, validateEnvVariables } from "../../libs/helpers/env.helper";
 
 // Load environment variables before defining config
 loadEnvironmentVariables();

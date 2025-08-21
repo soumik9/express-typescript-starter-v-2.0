@@ -7,7 +7,7 @@ import handleZodError from './zod.error';
 import handleCastError from './cast.error';
 import { IErrorMessage } from '../../app/modules';
 import handleValidationError from './validation.error';
-import { getCurrentTimestamp } from '../../libs/helpers';
+import { ServerEnvironmentEnum } from '../../libs/enums';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 
 const handleGlobalErrors: ErrorRequestHandler = (
@@ -67,7 +67,7 @@ const handleGlobalErrors: ErrorRequestHandler = (
     } else if (error instanceof Error) {
         // Generic error handling
         statusCode = httpStatus.INTERNAL_SERVER_ERROR;
-        message = config.ENV === 'production' ? 'An unexpected error occurred' : error.message;
+        message = config.ENV === ServerEnvironmentEnum.Production ? 'An unexpected error occurred' : error.message;
         errorMessages = [{ path: '', message: error.message || 'Unknown error' }];
     }
 
@@ -77,8 +77,7 @@ const handleGlobalErrors: ErrorRequestHandler = (
         success: false,
         message,
         error_messages: errorMessages,
-        stack: config.ENV !== 'production' ? error?.stack : undefined,
-        timestamp: getCurrentTimestamp(),
+        stack: config.ENV !== ServerEnvironmentEnum.Production ? error?.stack : undefined,
         path: req.originalUrl || '',
     });
 };
