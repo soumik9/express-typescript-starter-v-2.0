@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import dotenv from 'dotenv';
+import { ZodObject } from "zod";
 
 /**
  * dont use errorLogger here, because it may not be defined yet
@@ -9,6 +10,7 @@ import dotenv from 'dotenv';
 
 // @desc: Load environment variables from .env files based on the current environment
 export const loadEnvironmentVariables = (): void => {
+
     // Load the default .env file first to initialize NODE_ENV
     const defaultEnvPath = path.join(process.cwd(), '.env');
     if (fs.existsSync(defaultEnvPath)) {
@@ -42,20 +44,13 @@ export const loadEnvironmentVariables = (): void => {
     }
 };
 
-
 // @helper: Validate required environment variables
-export const validateEnvVariables = (requiredVars: string[]): void => {
-    const missing = requiredVars.filter(varName => !process.env[varName]);
-
-    if (missing.length > 0) {
-        const error = `Missing required environment variables: ${missing.join(', ')}`;
-
-        // Use the safe logging function instead of potentially undefined errorLogger
-        console.log('error', error);
-
-        // Only throw in development to avoid exposing details in production
-        if (process.env.NODE_ENV !== 'production') {
-            throw new Error(error);
-        }
+export const validateEnvVariables = (schema: ZodObject): any => {
+    const parsed = schema.safeParse(process.env);
+    if (!parsed.success) {
+        const error = `Invalid environment variables: ${parsed.error.issues.map(issue => `${issue.path.join('.')} - ${issue.message}`).join(', ')}`;
+        throw new Error(error);
     }
+
+    return parsed.data;
 };

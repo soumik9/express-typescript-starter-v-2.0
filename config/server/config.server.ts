@@ -1,55 +1,112 @@
+import z from "zod";
 import { loadEnvironmentVariables, validateEnvVariables } from "../../libs/helpers/env.helper";
 
 // Load environment variables before defining config
 loadEnvironmentVariables();
 
 // Define required environment variables
-const requiredVariables = [
-    // 'PORT', 'NODE_ENV', 'BCRYPT_SALT_ROUND',
-    "BASE_URL", "CLIENT_BASE_URL",
-    'MONGODB_URI', 'MONGODB_DATABASE_NAME',
-    'TOKEN_SECRET', 'TOKEN_SECRET_EXP',
-    'DEFAULT_ADMIN_PHONE', 'DEFAULT_ADMIN_PASSWORD', 'DEFAULT_ADMIN_ROLE'
-];
+const EnvSchema = z.object({
+    NODE_ENV: z
+        .enum(['development', 'test', 'production']).default('development'),
+    PORT: z
+        .string()
+        .nonempty({ error: "PORT is required." }),
+
+    TOKEN_SECRET: z
+        .string()
+        .nonempty({ error: "Token secret is required." }),
+    TOKEN_SECRET_EXP: z
+        .string()
+        .nonempty({ error: "Token secret expiration is required." }),
+
+    BCRYPT_SALT_ROUND: z
+        .string()
+        .nonempty({ error: "Bcrypt salt round is required." }),
+
+
+    MONGODB_URI: z
+        .string()
+        .nonempty({ error: "Mongo URI is required." }),
+
+    MONGODB_DATABASE_NAME: z
+        .string()
+        .nonempty({ error: "MongoDB database name is required." }),
+
+    BASE_URL: z
+        .string()
+        .nonempty({ error: "Base URL is required." }),
+    CLIENT_BASE_URL: z
+        .string()
+        .nonempty({ error: "Client base URL is required." }),
+
+    DEFAULT_ADMIN_PHONE: z
+        .string()
+        .nonempty({ error: "Default admin phone is required." }),
+    DEFAULT_ADMIN_PASSWORD: z
+        .string()
+        .nonempty({ error: "Default admin password is required." }),
+    DEFAULT_ADMIN_ROLE: z
+        .string()
+        .nonempty({ error: "Default admin role is required." }),
+
+    EMAIL_ID: z
+        .string()
+        .nonempty({ error: "Email ID is required." }),
+    EMAIL_PASSWORD: z
+        .string()
+        .nonempty({ error: "Email password is required." }),
+    EMAIL_HOST: z
+        .string()
+        .nonempty({ error: "Email host is required." }),
+    EMAIL_PORT: z
+        .string()
+        .nonempty({ error: "Email port is required." }),
+    EMAIL_NAME: z
+        .string()
+        .nonempty({ error: "Email name is required." }),
+    EMAIL_FROM: z
+        .string()
+        .nonempty({ error: "Email from address is required." })
+});
 
 // Validate environment variables
-validateEnvVariables(requiredVariables);
+const parsedConfig = validateEnvVariables(EnvSchema);
 
 // Export the environment variables
 export const config = {
-    PORT: process.env.PORT,
-    ENV: process.env.NODE_ENV || 'development',
+    PORT: parsedConfig.PORT,
+    ENV: parsedConfig.NODE_ENV || 'development',
     TOKEN: {
-        SECRET: process.env.TOKEN_SECRET,
-        EXPIRES_IN: process.env.TOKEN_SECRET_EXP,
+        SECRET: parsedConfig.TOKEN_SECRET,
+        EXPIRES_IN: parsedConfig.TOKEN_SECRET_EXP,
     },
     BCRYPT: {
-        SALT_ROUND: process.env.BCRYPT_SALT_ROUND,
+        SALT_ROUND: parsedConfig.BCRYPT_SALT_ROUND,
     },
     DATABASE: {
-        MONGO_URI: process.env.MONGODB_URI,
-        NAME: process.env.MONGODB_DATABASE_NAME,
+        MONGO_URI: parsedConfig.MONGODB_URI,
+        NAME: parsedConfig.MONGODB_DATABASE_NAME,
     },
 
     URL: {
-        BASE: process.env.BASE_URL,
-        CLIENT: process.env.CLIENT_BASE_URL,
+        BASE: parsedConfig.BASE_URL,
+        CLIENT: parsedConfig.CLIENT_BASE_URL,
     },
 
     MAIL: {
-        ID: process.env.EMAIL_ID,
-        PASSWORD: process.env.EMAIL_PASSWORD,
-        HOSTNAME: process.env.EMAIL_HOST,
-        PORT: process.env.EMAIL_PORT,
-        NAME: process.env.EMAIL_NAME,
-        FROM: process.env.EMAIL_FROM,
+        ID: parsedConfig.EMAIL_ID,
+        PASSWORD: parsedConfig.EMAIL_PASSWORD,
+        HOSTNAME: parsedConfig.EMAIL_HOST,
+        PORT: parsedConfig.EMAIL_PORT,
+        NAME: parsedConfig.EMAIL_NAME,
+        FROM: parsedConfig.EMAIL_FROM,
     },
 
     SEEDER: {
         DEFAULT_ADMIN: {
-            PHONE: process.env.DEFAULT_ADMIN_PHONE,
-            PASSWORD: process.env.DEFAULT_ADMIN_PASSWORD,
-            ROLE: process.env.DEFAULT_ADMIN_ROLE,
+            PHONE: parsedConfig.DEFAULT_ADMIN_PHONE,
+            PASSWORD: parsedConfig.DEFAULT_ADMIN_PASSWORD,
+            ROLE: parsedConfig.DEFAULT_ADMIN_ROLE,
         },
     }
 };
