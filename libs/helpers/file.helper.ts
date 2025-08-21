@@ -33,6 +33,9 @@ export const moveFilesToSpecificFolder = async (sourcePaths: string | string[], 
             return publicUrl;
         }));
 
+        if (!results.length || !results[0])
+            return isMultiple ? [] : "";
+
         // Return single result or array based on input type
         return isMultiple ? results : results[0];
     } catch (error) {

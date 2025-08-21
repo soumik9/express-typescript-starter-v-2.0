@@ -9,6 +9,9 @@ import { IErrorMessage } from '../../app/modules';
 import handleValidationError from './validation.error';
 import { ServerEnvironmentEnum } from '../../libs/enums';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
+import { errorLogger } from '../logger';
+
+type KnownErrors = 'ValidationError' | 'CastError' | 'TokenExpiredError' | 'JsonWebTokenError';
 
 const handleGlobalErrors: ErrorRequestHandler = (
     error, req: Request, res: Response, next: NextFunction
@@ -20,7 +23,7 @@ const handleGlobalErrors: ErrorRequestHandler = (
     let errorMessages: IErrorMessage[] = [];
 
     // Error type mapping for consistent processing
-    const errorHandlers: Record<string, () => void> = {
+    const errorHandlers: Record<KnownErrors, () => void> = {
         ValidationError: () => {
             const result = handleValidationError(error);
             statusCode = result.statusCode;
@@ -48,10 +51,12 @@ const handleGlobalErrors: ErrorRequestHandler = (
         }
     };
 
+    const handler = error?.name ? errorHandlers[error.name as KnownErrors] : undefined;
+
     // Process known error types
-    if (error?.name && errorHandlers[error.name]) {
-        errorHandlers[error.name]();
-    } else if (error instanceof ZodError) {
+    if (handler)
+        handler();
+    else if (error instanceof ZodError) {
         const result = handleZodError(error);
         statusCode = result.statusCode;
         message = result.message;
@@ -65,10 +70,18 @@ const handleGlobalErrors: ErrorRequestHandler = (
         message = error.message;
         errorMessages = [{ path: '', message: error.message || 'API Error' }];
     } else if (error instanceof Error) {
-        // Generic error handling
         statusCode = httpStatus.INTERNAL_SERVER_ERROR;
         message = config.ENV === ServerEnvironmentEnum.Production ? 'An unexpected error occurred' : error.message;
         errorMessages = [{ path: '', message: error.message || 'Unknown error' }];
+    } else {
+        statusCode = httpStatus.INTERNAL_SERVER_ERROR;
+        message = 'Unknown server error';
+        errorMessages = [{ path: '', message: 'Something went wrong' }];
+    }
+
+    // show the error
+    if (config.ENV !== ServerEnvironmentEnum.Production) {
+        errorLogger.error(`[ERROR] : ${error.message}`);
     }
 
     // Return standardized error response

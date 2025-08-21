@@ -1,6 +1,4 @@
 import path from "path";
-import moment from "moment";
-import { errorLogger } from "../../config";
 import { IApiReponse } from "../../app/modules";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 
@@ -11,7 +9,6 @@ export const catchAsync = (fn: RequestHandler) =>
             await fn(req, res, next);
         } catch (error) {
             next(error);
-            errorLogger.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
         }
     };
 
@@ -21,11 +18,14 @@ export const sendResponse = <T>(res: Response, data: IApiReponse<T>): void => {
         statusCode: data.statusCode,
         success: data.success,
         message: data.message || null,
-        meta: data.meta || null || undefined,
-        data: data.data || null || undefined,
+        meta: data.meta || null,
+        data: data.data || null,
     };
 
-    res.status(data.statusCode).json(responseData);
+    res.status(data.statusCode).json({
+        status_code: data.statusCode,
+        ...responseData
+    });
 };
 
 // @helper: Get request full url

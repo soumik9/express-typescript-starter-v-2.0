@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { IUser } from "./user.interface";
 
 // Base User DTO
-export class UserDto implements Partial<IUser> {
+export class UserDto {
     _id: Types.ObjectId | string;
     firstName: string;
     lastName: string;

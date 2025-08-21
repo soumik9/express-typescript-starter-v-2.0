@@ -47,12 +47,12 @@ export const getPaginatedData = async <T>({
     return {
         data,
         meta: {
-            totalItems,
-            totalPages,
-            currentPage,
-            pageSize,
-            hasNextPage,
-            hasPreviousPage,
+            total_items: totalItems,
+            total_pages: totalPages,
+            current_page: currentPage,
+            page_size: pageSize,
+            has_next_page: hasNextPage,
+            has_previous_page: hasPreviousPage,
         },
     };
 };
@@ -80,12 +80,12 @@ export const getManualPaginatedData = <T>(data: T[], page = 1, limit = 10) => {
     return {
         data: paginatedData,
         meta: {
-            totalItems,
-            totalPages,
-            currentPage,
-            pageSize,
-            hasNextPage,
-            hasPreviousPage,
+            total_items: totalItems,
+            total_pages: totalPages,
+            current_page: currentPage,
+            page_size: pageSize,
+            has_next_page: hasNextPage,
+            has_previous_page: hasPreviousPage,
         },
     };
 };

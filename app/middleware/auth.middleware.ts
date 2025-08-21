@@ -15,7 +15,7 @@ export const authMiddleware = (...requiredRoles: string[]) => async (req: Reques
         const token = authHeader.split(' ')[1];
 
         // Verify the token and decode user data
-        const verifiedToken: JwtPayload = verifyToken(token, config.TOKEN.SECRET as Secret);
+        const verifiedToken: JwtPayload = verifyToken(String(token), config.TOKEN.SECRET as Secret);
         if (!verifiedToken || !verifiedToken._id)
             throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid or expired token');
 

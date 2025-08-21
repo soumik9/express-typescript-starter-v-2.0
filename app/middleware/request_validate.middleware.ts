@@ -1,8 +1,8 @@
+import { ZodJSONSchema } from 'zod';
 import { errorLogger } from '../../config';
-import { AnyZodObject, ZodEffects } from 'zod';
 import { NextFunction, Request, Response } from 'express';
 
-export const zodRequestValidator = (schema: AnyZodObject | ZodEffects<AnyZodObject>) =>
+export const zodRequestValidator = (schema: ZodJSONSchema) =>
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
 

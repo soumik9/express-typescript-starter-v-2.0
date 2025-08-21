@@ -1,11 +1,14 @@
-import { ZodError, ZodIssue } from 'zod';
+import { ZodError } from 'zod';
 import { IGenericErrorMessage, IGenericErrorResponse } from '../../app/modules';
 
 const handleZodError = (error: ZodError): IGenericErrorResponse => {
-    const errors: IGenericErrorMessage[] = error.issues.map((issue: ZodIssue) => {
+
+    const errors: IGenericErrorMessage[] = error.issues.map((issue: ZodError['issues'][number]) => {
+        const pathString = issue.path.length > 0 ? issue.path.join('.') : '';
+
         return {
-            path: issue?.path[issue.path.length - 1],
-            message: issue?.message,
+            path: pathString,
+            message: issue.message,
         };
     });
 

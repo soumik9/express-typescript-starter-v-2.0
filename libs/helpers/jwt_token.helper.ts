@@ -1,5 +1,5 @@
-import jwt, { JwtPayload, Secret } from 'jsonwebtoken'
 import { config } from '../../config';
+import jwt, { JwtPayload, Secret } from 'jsonwebtoken'
 
 // @helper: generate token
 export const generateToken = (data: any): String => {
@@ -10,7 +10,7 @@ export const generateToken = (data: any): String => {
 
     // token generating
     const token = jwt.sign(
-        payload, config.TOKEN.SECRET as Secret, { expiresIn: config.TOKEN.EXPIRES_IN }
+        payload, config.TOKEN.SECRET as Secret, { expiresIn: String(config.TOKEN.EXPIRES_IN) }
     );
 
     return token;

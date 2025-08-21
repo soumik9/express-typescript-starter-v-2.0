@@ -1,9 +1,8 @@
-import { Schema, model } from 'mongoose';
-import { NextFunction } from 'connect';
 import validator from "validator";
-import { IUser, IUserMethods } from './user.interface';
+import { IUser, IUserMethods } from '.';
+import { Schema, model } from 'mongoose';
 import { CommonSchema } from '../common';
-import { comparePassword, generateHash } from '../../../libs/helpers';
+import { compareHash, generateHash } from '../../../libs/helpers';
 
 const UserSchema = new Schema<IUser, {}, IUserMethods>({
     firstName: {
@@ -46,11 +45,11 @@ UserSchema.add(CommonSchema);
 
 // checking is password matched
 UserSchema.methods.isPasswordMatched = async function (givenPassword: string, savedPassword: string): Promise<boolean> {
-    return await comparePassword(givenPassword, savedPassword);
+    return await compareHash(givenPassword, savedPassword);
 }
 
 // create or save works for both
-UserSchema.pre("save", async function (next: NextFunction) {
+UserSchema.pre("save", async function (next) {
     if (!this.isModified("password")) {
         return next();
     }
