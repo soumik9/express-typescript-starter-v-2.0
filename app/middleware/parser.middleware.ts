@@ -2,7 +2,7 @@ import httpStatus from 'http-status';
 import { config, errorLogger, infoLogger } from '../../config';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 
-// *parseRequestBody middleware*
+// @middleware: parseRequestBody 
 export const handleParseRequestBody: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
     try {
         if (req.body && typeof req.body.data === 'string') {

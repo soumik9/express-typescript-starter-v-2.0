@@ -1,14 +1,12 @@
-import express, { Application, NextFunction, Request, Response } from 'express';
 import cors from 'cors'
-import helmet from "helmet";
-// @ts-ignore
-import xss from 'xss-clean';
-import sanitize from 'express-mongo-sanitize';
-import { handleParseRequestBody } from './parser.middleware';
 import moment from 'moment';
+import helmet from "helmet";
 import { getRequestFulllUrl } from '../../libs/helpers';
 import { httpLogger, multerUpload } from '../../config';
+import { handleParseRequestBody } from './parser.middleware';
+import express, { Application, NextFunction, Request, Response } from 'express';
 
+// @middleware: request Log Middleware
 const handleRequestLog = (req: Request, res: Response, next: NextFunction) => {
     const { method } = req;
     const startTime = moment();
@@ -29,8 +27,7 @@ export const serverMiddlewares = (app: Application) => {
     app.use(express.json());
     app.use(cors());
     app.use(express.urlencoded({ extended: true }));
-    app.use(sanitize());
-    app.use(xss());
+
     app.use(helmet({
         crossOriginResourcePolicy: { policy: 'cross-origin' },
     }));

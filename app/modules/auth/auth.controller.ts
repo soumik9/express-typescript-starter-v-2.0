@@ -8,7 +8,7 @@ export const Signin: RequestHandler = catchAsync(
     async (req: Request, res: Response) => {
 
         // parsing data
-        const body = req.body && req.body.data ? JSON.parse(req.body.data) : {};
+        const body = req.body;
         const { email, password: reqPassword } = body;
 
         // checking email and password given

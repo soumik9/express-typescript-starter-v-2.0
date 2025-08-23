@@ -15,6 +15,7 @@ app.use('/public', handleCheckPublicFileExists, express.static('public'));
 
 // Welcome route
 app.get('/', (req, res) => {
+    console.log(req.query);
     const filePath = path.join(process.cwd(), 'public', 'html', 'index.html');
     res.sendFile(filePath);
 });
