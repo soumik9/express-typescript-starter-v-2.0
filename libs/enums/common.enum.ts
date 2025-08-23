@@ -12,3 +12,8 @@ export enum FnFileReturnTypeEnum {
     Single = 'single',
     Multiple = 'multiple',
 }
+
+export enum ServerEnvironmentEnum {
+    Development = 'development',
+    Production = 'production',
+}

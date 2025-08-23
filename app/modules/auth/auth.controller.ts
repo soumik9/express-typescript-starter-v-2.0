@@ -1,7 +1,7 @@
-import { Request, RequestHandler, Response } from "express";
 import httpStatus from "http-status";
-import { catchAsync, sendResponse } from "../../../libs/helpers";
 import { ApiError } from "../../../config/errors";
+import { Request, RequestHandler, Response } from "express";
+import { catchAsync, sendSuccessResponse } from "../../../libs/helpers";
 
 // signin controller
 export const Signin: RequestHandler = catchAsync(
@@ -32,7 +32,7 @@ export const Signin: RequestHandler = catchAsync(
         // user data to send with response
         // const { password, ...pwd } = user;
 
-        sendResponse(res, {
+        sendSuccessResponse(res, {
             statusCode: httpStatus.OK,
             success: true,
             message: 'Login Success!',

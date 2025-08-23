@@ -28,6 +28,9 @@ export type IErrorResponse = {
     statusCode: number;
     message: string;
     errorMessages: IErrorMessage[];
+    stack?: string;
+    path?: string;
+    error?: Error | null;
 };
 
 export interface IApiResponseMeta {

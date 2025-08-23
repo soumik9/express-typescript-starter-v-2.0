@@ -1,7 +1,7 @@
+import { Server } from "http";
 import { Application } from "express";
 import { config } from "./config.server";
-import { errorLogger, infoLogger } from "../logger";
-import { Server } from "http";
+import { errorLogger } from "../logger";
 import { handleProcessError } from "../errors";
 import { shutdownServerGracefully } from "./shutdown.server";
 import { conntectToDatabase } from "./database.server";
@@ -36,7 +36,7 @@ export const bootstrap = async (app: Application): Promise<Server> => {
 const startServer = (app: Application): Promise<Server> => {
     return new Promise((resolve) => {
         const server = app.listen(config.PORT, () => {
-            infoLogger.info(`Server running at: ${config.URL.BASE}`);
+            console.log(`Server running at: ${config.URL.BASE}`);
             resolve(server);
         });
     });

@@ -13,7 +13,7 @@ export const conntectToDatabase = async () => {
         mongoose.connection.on('disconnected', () => infoLogger.warn(`MongoDB disconnected: ${config.DATABASE.NAME}`));
         mongoose.connection.on('reconnected', () => infoLogger.info(`MongoDB reconnected: ${config.DATABASE.NAME}`));
 
-        infoLogger.info(`Connected to MongoDB: ${config.DATABASE.NAME}`);
+        console.log(`Connected to MongoDB: ${config.DATABASE.NAME}`);
         return mongoose.connection;
     } catch (error) {
         errorLogger.error(`Database connection failed: ${error instanceof Error ? error.message : 'unknown'}`);

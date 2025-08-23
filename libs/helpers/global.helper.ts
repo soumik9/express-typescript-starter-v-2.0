@@ -1,7 +1,7 @@
 import path from "path";
-import moment from "moment";
-import { errorLogger } from "../../config";
-import { IApiReponse } from "../../app/modules";
+import { IApiReponse, IErrorResponse } from "../../app/modules";
+import { ServerEnvironmentEnum } from "../enums";
+import { config, errorLogger } from "../../config";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 
 // @helper: Catch async errors
@@ -15,15 +15,31 @@ export const catchAsync = (fn: RequestHandler) =>
         }
     };
 
-// @helper: Send response
-export const sendResponse = <T>(res: Response, data: IApiReponse<T>): void => {
-    const responseData: IApiReponse<T> = {
-        statusCode: data.statusCode,
+// @helper: Send success response
+export const sendSuccessResponse = <T>(res: Response, data: IApiReponse<T>): void => {
+    const responseData = {
+        status_code: data.statusCode,
         success: data.success,
         message: data.message || null,
-        meta: data.meta || null || undefined,
-        data: data.data || null || undefined,
+        meta: data.meta || null,
+        data: data.data || null,
     };
+
+    res.status(data.statusCode).json(responseData);
+};
+
+
+// @helper: Send error response
+export const sendErrorResponse = (res: Response, data: IErrorResponse): void => {
+
+    const responseData = {
+        status_code: data.statusCode,
+        success: false,
+        message: data.message || 'Something went wrong !',
+        error_messages: data.errorMessages || [],
+        stack: config.ENV !== ServerEnvironmentEnum.Production ? data.error?.stack || null : undefined,
+        path: data.path || '',
+    }
 
     res.status(data.statusCode).json(responseData);
 };
