@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 30
+    },
+    "auditLog": "M:\\Personal\\express-typescript-starter-v-2.0\\logs\\http\\.audit-http.json",
+    "files": [
+        {
+            "date": 1756289264985,
+            "name": "M:\\Personal\\express-typescript-starter-v-2.0\\logs\\http\\27-08-2025-http.log",
+            "hash": "13d28f2437651b116362d0f2d411d67e2f9110dcdf9b0a3c96d9e09d86d18a40"
+        }
+    ],
+    "hashType": "sha256"
+}
