@@ -1,9 +1,8 @@
-import path from 'path';
 import express, { Application, ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { bootstrap, handleGlobalErrors } from './config';
 import { handleCheckPublicFileExists, serverMiddlewares } from './app/middleware';
 import { MainRoutes } from './app/routes';
-import { handleRouteNotFound } from './app/modules';
+import { handleHealthRoute, handleRouteNotFound, handleWelcomeRoute } from './app/modules';
 
 const app: Application = express();
 
@@ -13,11 +12,9 @@ serverMiddlewares(app);
 // files route
 app.use('/public', handleCheckPublicFileExists, express.static('public'));
 
-// Welcome route
-app.get('/', (req, res) => {
-    const filePath = path.join(process.cwd(), 'public', 'html', 'index.html');
-    res.sendFile(filePath);
-});
+// stat route
+app.get("/", handleWelcomeRoute);
+app.get("/healthz", handleHealthRoute(app));
 
 // all routes
 app.use('/api/v1', MainRoutes);

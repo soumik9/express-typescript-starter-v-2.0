@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found</title>
+    <style>
+        :root {
+            --accent: #FF5C70;
+            --card-bg: rgba(17, 23, 38, 0.85);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-light: #eaf7ee;
+            --button-bg: #111726;
+            --button-border: #253046;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+
+        body {
+            font-family: 'Inter', 'Roboto', Arial, sans-serif;
+            background: linear-gradient(135deg, #580511, #460d13 60%, #450406);
+            color: var(--text-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-rendering: optimizeLegibility;
+            padding: 24px;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 480px;
+            padding: 40px 30px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border-radius: 22px;
+            background: linear-gradient(45deg, #FF5C70, #FF8A5C, #FF5C70);
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        h1 {
+            font-size: 96px;
+            margin-bottom: 16px;
+            color: var(--accent);
+            text-shadow: 0 4px 15px rgba(255, 92, 112, 0.6);
+        }
+
+        p {
+            font-size: 16px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        strong {
+            color: var(--accent);
+        }
+
+        a.url-link {
+            color: var(--text-light);
+            text-decoration: underline;
+            word-break: break-all;
+        }
+
+        a.button {
+            display: inline-block;
+            padding: 12px 28px;
+            font-size: 16px;
+            color: var(--text-light);
+            background: var(--button-bg);
+            border: 1px solid var(--button-border);
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        a.button:hover {
+            background: var(--accent);
+            color: #0b0e14;
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 92, 112, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>404</h1>
+        <p>Oops! The page you’re looking for was not found.</p>
+        <p><strong>URL:</strong> <a href="{{original_url}}" class="url-link">{{full_url}}</a></p>
+        <a href="/" class="button">Go Back Home</a>
+    </div>
+</body>
+
+</html>

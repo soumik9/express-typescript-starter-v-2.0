@@ -1,18 +1,50 @@
-import fs from 'fs';
-import path from 'path';
 import httpStatus from 'http-status';
-import { Request, Response } from 'express';
-import { getRequestFulllUrl } from '../../../libs/helpers';
+import { Application, Request, Response } from 'express';
+import { EMAIL_TEMPLATE_ENUM } from '../../../libs/enums';
+import { getRequestFulllUrl, getServerHealth, renderTemplate } from '../../../libs/helpers';
 
-export const handleRouteNotFound = (req: Request, res: Response) => {
-    const filePath = path.join(process.cwd(), 'public', 'html', 'NotFound.html');
-    fs.readFile(filePath, 'utf8', (err, data) => {
-        if (err) {
-            return res.status(httpStatus.INTERNAL_SERVER_ERROR).send('Error loading page.');
-        }
-
-        const updatedHtml = data.replace('${req.originalUrl}', getRequestFulllUrl(req));
-
-        res.status(httpStatus.NOT_FOUND).send(updatedHtml);
+// home route
+export const handleWelcomeRoute = (req: Request, res: Response) => {
+    const htmlContent = renderTemplate(EMAIL_TEMPLATE_ENUM.HOME, {
+        title: "Backend",
+        explore_url: "https://soumikahammed.com/",
     });
+
+    res
+        .setHeader("Content-Type", "text/html; charset=utf-8")
+        .status(httpStatus.OK)
+        .send(htmlContent);
+}
+
+// Health route
+export const handleHealthRoute = (app: Application) => {
+    return (req: Request, res: Response) => {
+        const healthData = getServerHealth(app);
+
+        // Render HTML or JSON
+        if (req.query.format === "json") {
+            res
+                .status(healthData.isReady ? httpStatus.OK : httpStatus.SERVICE_UNAVAILABLE)
+                .json(healthData);
+        } else {
+            const htmlContent = renderTemplate(EMAIL_TEMPLATE_ENUM.HEALTH, healthData);
+            res
+                .setHeader("Content-Type", "text/html; charset=utf-8")
+                .status(healthData.isReady ? httpStatus.OK : httpStatus.SERVICE_UNAVAILABLE)
+                .send(htmlContent);
+        }
+    };
+};
+
+// not found
+export const handleRouteNotFound = (req: Request, res: Response) => {
+    const htmlContent = renderTemplate(EMAIL_TEMPLATE_ENUM.NOT_FOUND, {
+        original_url: req.originalUrl,
+        full_url: getRequestFulllUrl(req),
+    });
+
+    res
+        .setHeader("Content-Type", "text/html; charset=utf-8")
+        .status(httpStatus.NOT_FOUND)
+        .send(htmlContent);
 };
