@@ -1,5 +1,5 @@
 import z from "zod";
-import { loadEnvironmentVariables, validateEnvVariables } from "../../libs/helpers/env.helper";
+import { loadEnvironmentVariables, validateEnvVariables } from "../../libs/helper/core/env.helper";
 
 // Load environment variables before defining config
 loadEnvironmentVariables();
@@ -10,63 +10,63 @@ const EnvSchema = z.object({
         .enum(['development', 'test', 'production']).default('development'),
     PORT: z
         .string()
-        .nonempty({ error: "PORT is required." }),
+        .nonempty({ message: "PORT is required." }),
 
     TOKEN_SECRET: z
         .string()
-        .nonempty({ error: "Token secret is required." }),
+        .nonempty({ message: "Token secret is required." }),
     TOKEN_SECRET_EXP: z
         .string()
-        .nonempty({ error: "Token secret expiration is required." }),
+        .nonempty({ message: "Token secret expiration is required." }),
 
     BCRYPT_SALT_ROUND: z
         .string()
-        .nonempty({ error: "Bcrypt salt round is required." }),
+        .nonempty({ message: "Bcrypt salt round is required." }),
 
 
     MONGODB_URI: z
         .string()
-        .nonempty({ error: "Mongo URI is required." }),
+        .nonempty({ message: "Mongo URI is required." }),
 
     MONGODB_DATABASE_NAME: z
         .string()
-        .nonempty({ error: "MongoDB database name is required." }),
+        .nonempty({ message: "MongoDB database name is required." }),
 
     BASE_URL: z
         .string()
-        .nonempty({ error: "Base URL is required." }),
+        .nonempty({ message: "Base URL is required." }),
     CLIENT_BASE_URL: z
         .string()
-        .nonempty({ error: "Client base URL is required." }),
+        .nonempty({ message: "Client base URL is required." }),
 
     DEFAULT_ADMIN_PHONE: z
         .string()
-        .nonempty({ error: "Default admin phone is required." }),
+        .nonempty({ message: "Default admin phone is required." }),
     DEFAULT_ADMIN_PASSWORD: z
         .string()
-        .nonempty({ error: "Default admin password is required." }),
+        .nonempty({ message: "Default admin password is required." }),
     DEFAULT_ADMIN_ROLE: z
         .string()
-        .nonempty({ error: "Default admin role is required." }),
+        .nonempty({ message: "Default admin role is required." }),
 
     EMAIL_ID: z
         .string()
-        .nonempty({ error: "Email ID is required." }),
+        .nonempty({ message: "Email ID is required." }),
     EMAIL_PASSWORD: z
         .string()
-        .nonempty({ error: "Email password is required." }),
+        .nonempty({ message: "Email password is required." }),
     EMAIL_HOST: z
         .string()
-        .nonempty({ error: "Email host is required." }),
+        .nonempty({ message: "Email host is required." }),
     EMAIL_PORT: z
         .string()
-        .nonempty({ error: "Email port is required." }),
+        .nonempty({ message: "Email port is required." }),
     EMAIL_NAME: z
         .string()
-        .nonempty({ error: "Email name is required." }),
+        .nonempty({ message: "Email name is required." }),
     EMAIL_FROM: z
         .string()
-        .nonempty({ error: "Email from address is required." })
+        .nonempty({ message: "Email from address is required." })
 });
 
 // Validate environment variables

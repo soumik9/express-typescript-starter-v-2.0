@@ -9,8 +9,7 @@ export class UserDto {
     phone: string;
     image?: string;
     email: string;
-    created_at: number | undefined;
-    updated_at: number | undefined;
+    created_at: number;
 
     constructor(user: IUser) {
         this._id = user._id!;
@@ -19,8 +18,7 @@ export class UserDto {
         this.phone = user.phone;
         this.image = user.image;
         this.email = user.email;
-        this.created_at = user.created_at;
-        this.updated_at = user.updated_at;
+        this.created_at = Number(user.created_at);
     }
 }
 

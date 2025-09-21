@@ -1,5 +1,5 @@
 import { Model } from "mongoose";
-import { ICommonSchema } from "../common";
+import { ICommonModel } from "../core";
 
 export interface IUserLoginResponse extends IUser {
     accessToken: string;
@@ -7,7 +7,7 @@ export interface IUserLoginResponse extends IUser {
 }
 
 // admin schema interface
-export interface IUser extends ICommonSchema {
+export interface IUser extends ICommonModel {
     firstName: string;
     lastName: string;
     phone: string;

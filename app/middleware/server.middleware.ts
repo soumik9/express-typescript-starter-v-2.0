@@ -1,7 +1,7 @@
 import cors from 'cors'
 import moment from 'moment';
 import helmet from "helmet";
-import { getRequestFulllUrl } from '../../libs/helpers';
+import { getRequestFulllUrl } from '../../libs/helper';
 import { httpLogger, multerUpload } from '../../config';
 import { handleParseRequestBody } from './parser.middleware';
 import express, { Application, NextFunction, Request, Response } from 'express';

@@ -11,11 +11,21 @@ export const handleParseQuery = (query: any): {
     const status = query.status ? query.status.toString() : null;
     const search = query.search ? query.search.toString() : null;
 
+    const result: Record<string, string | number | boolean | null> = {};
+
+    // string query parameters
+    const stringKeys = ["admin_id"];
+
+    stringKeys.forEach((key) => {
+        result[key] = query[key] ? query[key].toString() : "";
+    });
+
     return {
         page,
         limit,
 
         status,
-        search
+        search,
+        ...result,
     }
 }

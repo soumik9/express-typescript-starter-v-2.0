@@ -1,7 +1,7 @@
-import { Request } from "express";
-import multer from 'multer'
-import path from 'path'
 import fs from 'fs'
+import path from 'path'
+import multer from 'multer'
+import { Request } from "express";
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {

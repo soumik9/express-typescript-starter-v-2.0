@@ -1,4 +1,4 @@
-import { config } from '../../config';
+import { config } from '../../../config';
 import jwt, { JwtPayload, Secret } from 'jsonwebtoken'
 
 // @helper: generate token

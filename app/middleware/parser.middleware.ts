@@ -1,5 +1,6 @@
 import httpStatus from 'http-status';
-import { config, errorLogger, infoLogger } from '../../config';
+import { sendErrorResponse } from '../../libs/helper';
+import { errorLogger, infoLogger } from '../../config';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 
 // @middleware: parseRequestBody 
@@ -9,10 +10,18 @@ export const handleParseRequestBody: RequestHandler = (req: Request, res: Respon
 
             // Simple check to prevent excessive large payloads
             if (req.body.data.length > 5_000_000) { // 5MB limit
-                res.status(httpStatus.REQUEST_ENTITY_TOO_LARGE).json({
+                sendErrorResponse(res, {
+                    statusCode: httpStatus.REQUEST_ENTITY_TOO_LARGE,
                     message: "Request data too large",
+                    errorMessages: [{
+                        path: "",
+                        message: "Request data too large",
+
+                    }],
+                    error: null,
+                    path: req.originalUrl || '',
                 });
-                return; // void return
+                return;
             }
 
             const parsedData = JSON.parse(req.body.data);
@@ -27,13 +36,18 @@ export const handleParseRequestBody: RequestHandler = (req: Request, res: Respon
         const err = error as Error;
 
         if (err instanceof SyntaxError) {
-            // Specific handling for JSON parsing errors
-            res.status(httpStatus.BAD_REQUEST).json({
-                success: false,
+            sendErrorResponse(res, {
+                statusCode: httpStatus.BAD_REQUEST,
                 message: "Invalid JSON format",
-                stack: config.ENV === 'production' ? undefined : err.message
+                errorMessages: [{
+                    path: "",
+                    message: "Invalid JSON format",
+
+                }],
+                error: null,
+                path: req.originalUrl || '',
             });
-            return; // void return
+            return;
         }
 
         // Log detailed error information
@@ -45,10 +59,17 @@ export const handleParseRequestBody: RequestHandler = (req: Request, res: Respon
         });
 
         // Generic server error response
-        res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+        sendErrorResponse(res, {
+            statusCode: httpStatus.INTERNAL_SERVER_ERROR,
             message: "Server error processing request",
-            error: config.ENV === 'production' ? undefined : err.message
+            errorMessages: [{
+                path: "",
+                message: "Server error processing request",
+
+            }],
+            error: null,
+            path: req.originalUrl || '',
         });
-        return; // void return
+        return;
     }
 };

@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { config } from '../../config';
+import { config } from '../../../config';
 
 // @helper: compareHash function
 export const compareHash = async (comparableString: string, hashValue: string): Promise<boolean> => {

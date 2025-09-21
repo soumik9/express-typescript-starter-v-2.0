@@ -7,9 +7,10 @@ import handleZodError from './zod.error';
 import handleCastError from './cast.error';
 import { IErrorMessage } from '../../app/modules';
 import handleValidationError from './validation.error';
-import { ServerEnvironmentEnum } from '../../libs/enums';
+import { ServerEnvironmentEnum } from '../../libs/enum';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { errorLogger } from '../logger';
+import { sendErrorResponse } from '../../libs/helper';
 
 type KnownErrors = 'ValidationError' | 'CastError' | 'TokenExpiredError' | 'JsonWebTokenError';
 
@@ -80,17 +81,17 @@ const handleGlobalErrors: ErrorRequestHandler = (
     }
 
     // show the error
+    // show the error
     if (config.ENV !== ServerEnvironmentEnum.Production) {
         errorLogger.error(`[ERROR] : ${error.message}`);
     }
 
     // Return standardized error response
-    return res.json({
-        status_code: statusCode,
-        success: false,
+    return sendErrorResponse(res, {
+        statusCode,
         message,
-        error_messages: errorMessages,
-        stack: config.ENV !== ServerEnvironmentEnum.Production ? error?.stack : undefined,
+        errorMessages,
+        error,
         path: req.originalUrl || '',
     });
 };

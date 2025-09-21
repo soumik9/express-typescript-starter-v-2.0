@@ -1,8 +1,8 @@
 import validator from "validator";
+import { CommonSchema } from "../core";
 import { IUser, IUserMethods } from '.';
 import { Schema, model } from 'mongoose';
-import { CommonSchema } from '../common';
-import { compareHash, generateHash } from '../../../libs/helpers';
+import { compareHash, generateHash } from '../../../libs/helper';
 
 const UserSchema = new Schema<IUser, {}, IUserMethods>({
     firstName: {

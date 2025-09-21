@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 import dotenv from 'dotenv';
-import { ZodObject } from "zod";
 
 /**
  * dont use errorLogger here, because it may not be defined yet
@@ -45,10 +44,10 @@ export const loadEnvironmentVariables = (): void => {
 };
 
 // @helper: Validate required environment variables
-export const validateEnvVariables = (schema: ZodObject): any => {
+export const validateEnvVariables = (schema: any): any => {
     const parsed = schema.safeParse(process.env);
     if (!parsed.success) {
-        const error = `Invalid environment variables: ${parsed.error.issues.map(issue => `${issue.path.join('.')} - ${issue.message}`).join(', ')}`;
+        const error = `Invalid environment variables: ${parsed.error.issues.map((issue: any) => `${issue.path.join('.')} - ${issue.message}`).join(', ')}`;
         throw new Error(error);
     }
 

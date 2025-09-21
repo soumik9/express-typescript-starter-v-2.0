@@ -1,8 +1,8 @@
-import { Request, RequestHandler, Response } from "express";
-import { catchAsync, sendResponse } from "../../../libs/helpers";
 import User from "./user.model";
-import { IUser } from "./user.interface";
 import httpStatus from "http-status";
+import { IUser } from "./user.interface";
+import { Request, RequestHandler, Response } from "express";
+import { catchAsync, sendSuccessResponse } from "../../../libs/helper";
 
 // get user by id
 export const GetUserById: RequestHandler = catchAsync(
@@ -11,7 +11,7 @@ export const GetUserById: RequestHandler = catchAsync(
         // finding profile data
         const result = await User.findById("abc").select("-password");
 
-        sendResponse<IUser>(res, {
+        sendSuccessResponse<IUser>(res, {
             statusCode: httpStatus.OK,
             success: true,
             message: 'Profile retrieved successfully!',

@@ -1,8 +1,8 @@
+import httpStatus from "http-status";
 import { config } from "../../config";
 import { promises as fsPromises } from "fs";
-import { ServerEnvironmentEnum } from "../../libs/enums";
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import { getLocalFilePath, getLocalRootPath } from "../../libs/helpers";
+import { getLocalFilePath, getLocalRootPath, sendErrorResponse } from "../../libs/helper";
 
 export const handleCheckPublicFileExists: RequestHandler = async (
     req: Request, res: Response, next: NextFunction
@@ -16,15 +16,18 @@ export const handleCheckPublicFileExists: RequestHandler = async (
 
         // Check if the requested path is trying to access files outside the intended directory
         if (!filePath.startsWith(getLocalRootPath())) {
-            res.status(403).json({
-                success: false,
+            sendErrorResponse(res, {
+                statusCode: httpStatus.UNAUTHORIZED,
                 message: "Access Denied",
                 errorMessages: [{
                     path: "",  // Not exposing the attempted path for security
-                    message: "Invalid file path requested"
-                }]
+                    message: "Invalid file path requested",
+
+                }],
+                error: null,
+                path: req.originalUrl || '',
             });
-            return; // void return, not returning res.status().json()
+            return;
         }
 
         // Check if file exists using the Promise-based API
@@ -33,18 +36,16 @@ export const handleCheckPublicFileExists: RequestHandler = async (
         // If execution reaches here, the file exists
         next();
     } catch (error) {
-        // File does not exist or cannot be accessed
-        res.status(404).json({
-            status_code: 404,
-            success: false,
+        sendErrorResponse(res, {
+            statusCode: httpStatus.NOT_FOUND,
             message: "File Not Found",
-            error_messages: [{
-                path: config.ENV === ServerEnvironmentEnum.Production ? '' : req.originalUrl,  // Only expose path in non-production
+            errorMessages: [{
+                path: config.ENV === 'production' ? '' : req.originalUrl,  // Only expose path in non-production
                 message: "Image not found or has been deleted."
             }],
-            stack: config.ENV !== ServerEnvironmentEnum.Production ? null : undefined,
+            error: null,
             path: req.originalUrl || '',
         });
-        return; // void return, not returning res.status().json()
+        return;
     }
 };

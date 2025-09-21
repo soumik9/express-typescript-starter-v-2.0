@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Service Health</title>
+    <style>
+        :root {
+            --bg: #0b0e14;
+            --card: #111726;
+            --muted: #9aa4b2;
+            --text: #e5e7eb;
+            --accent: #FF5C70;
+            --border: #253046;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            min-width: 760px;
+            max-width: 900px;
+            padding: 16px;
+        }
+
+        @media (max-width:720px) {
+            .container {
+                min-width: 480px;
+            }
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgb(0 0 0 / 30%);
+        }
+
+        .header {
+            padding: 18px 22px;
+            background: linear-gradient(90deg, var(--card), #1a2031);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+
+            background:$ {
+                color(ready)
+            }
+
+            box-shadow:0 0 12px $ {
+                color(ready)
+            }
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            padding: 18px 22px;
+        }
+
+        @media (max-width:720px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tile {
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .k {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .v {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        .footer {
+            padding: 14px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        a.btn,
+        button.btn {
+            display: inline-block;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .accent {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        code {
+            background: #0f1422;
+            border: 1px solid var(--border);
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <!-- Header -->
+            <div class="header">
+                <div class="dot" style="background:{{statusColor}}; box-shadow:0 0 12px {{statusColor}};"></div>
+                <h1>Service Health</h1>
+                <div style="margin-left:auto;">
+                    {{statusText}}
+                </div>
+            </div>
+
+            <!-- Grid with top-level details -->
+            <div class="grid">
+                <div class="tile">
+                    <div class="k">Uptime</div>
+                    <div class="v">{{uptime}}</div>
+                </div>
+                <div class="tile">
+                    <div class="k">Timestamp (UTC)</div>
+                    <div class="v">{{timestampUtc}}</div>
+                </div>
+                <div class="tile">
+                    <div class="k">Process ID</div>
+                    <div class="v">{{processId}}</div>
+                </div>
+                <div class="tile">
+                    <div class="k">Environment</div>
+                    <div class="v"><code>{{environment}}</code></div>
+                </div>
+                <div class="tile">
+                    <div class="k">Database</div>
+                    <div class="v">{{#if isDbConnected}}Connected{{else}}Disconnected{{/if}}</div>
+                </div>
+                <div class="tile">
+                    <div class="k">Node Version</div>
+                    <div class="v">{{nodeVersion}}</div>
+                </div>
+            </div>
+
+            <!-- System metrics table -->
+            <div style="padding:4px 22px 0">
+                <table>
+                    <tr>
+                        <td class="k">Memory (RSS)</td>
+                        <td class="v">{{rssMB}} MB</td>
+                    </tr>
+                    <tr>
+                        <td class="k">Heap Used / Total</td>
+                        <td class="v">{{heapUsedMB}} MB / {{heapTotalMB}} MB</td>
+                    </tr>
+                    <tr>
+                        <td class="k">Load Avg (1m / 5m / 15m)</td>
+                        <td class="v">{{loadAverages}}</td>
+                    </tr>
+                    <tr>
+                        <td class="k">Platform</td>
+                        <td class="v">{{platform}}</td>
+                    </tr>
+                    <tr>
+                        <td class="k">CPU Cores</td>
+                        <td class="v">{{cpuCores}}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <div></div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <a class="btn" href="/healthz?format=json">View JSON</a>
+                    <a class="btn" href="/healthz">Refresh</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -1,6 +1,6 @@
 import httpStatus from "http-status";
 import { ApiError, config } from "../../config";
-import { verifyToken } from "../../libs/helpers";
+import { verifyToken } from "../../libs/helper";
 import { JwtPayload, Secret } from 'jsonwebtoken'
 import { NextFunction, Request, Response } from "express";
 

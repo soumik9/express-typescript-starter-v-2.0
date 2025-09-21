@@ -1,8 +1,8 @@
 import path from "path";
-import { defaultImagePath } from "../constant";
-import { FnFileReturnTypeEnum } from "../enums";
-import { IUploadFile } from '../../app/modules';
-import { config, errorLogger, infoLogger } from '../../config';
+import { defaultImagePath } from "../../constant";
+import { FnFileReturnTypeEnum } from "../../enum";
+import { IUploadFile } from '../../../app/modules';
+import { config, errorLogger, infoLogger } from '../../../config';
 import { promises as fsPromises, existsSync, mkdirSync } from 'fs';
 
 // @helper: moveFilesToSpecificFolder function

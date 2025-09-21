@@ -1,10 +1,11 @@
+import { IAdmin } from ".";
+import { CommonSchema } from "../core";
 import { model, Schema } from "mongoose";
-import { CommonSchema } from "../common";
-import { IAdmin, IAdminMethods } from ".";
-import { AdminRoleEnum } from "../../../libs/enums";
-import { compareHash, generateHash } from "../../../libs/helpers";
+import { PhoneCountrySchema } from "../common";
+import { AdminRoleEnum } from "../../../libs/enum";
+import { generateHash } from "../../../libs/helper";
 
-const AdminSchema = new Schema<IAdmin, {}, IAdminMethods>({
+const AdminSchema = new Schema<IAdmin>({
     name: {
         type: String,
         required: [true, 'Name field is required'],
@@ -14,20 +15,7 @@ const AdminSchema = new Schema<IAdmin, {}, IAdminMethods>({
         required: [true, 'Phone number is required'],
         unique: true,
     },
-    country: {
-        code: {
-            type: String,
-            required: [true, 'Country code is required'],
-        },
-        name: {
-            type: String,
-            required: [true, 'Country name is required'],
-        },
-        dial_code: {
-            type: String,
-            required: [true, 'Country dial code is required'],
-        },
-    },
+    country: PhoneCountrySchema,
     password: {
         type: String,
         required: [true, 'Password is required'],
@@ -44,11 +32,6 @@ const AdminSchema = new Schema<IAdmin, {}, IAdminMethods>({
 
 // Inherit from CommonSchema
 AdminSchema.add(CommonSchema);
-
-// Method to verify if the password matches
-AdminSchema.methods.isPasswordMatched = async function (givenPassword: string): Promise<boolean> {
-    return await compareHash(givenPassword, this.password);
-};
 
 // Pre-save hook for hashing password before saving
 AdminSchema.pre("save", async function (next) {

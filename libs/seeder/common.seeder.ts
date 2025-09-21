@@ -22,7 +22,7 @@ export const seedDefaultAdmin = async () => {
             await admin.save({ validateBeforeSave: false });
             infoLogger.info("Admin data seeded successfully.");
         } else
-            console.log("Admin data already exists.");
+            infoLogger.warn("Admin data already exists.");
     } catch (error) {
         errorLogger.error(`Error seeding admin data: ${error instanceof Error ? error.message : 'unknown'}`);
     }

@@ -2,27 +2,29 @@ import fs from "fs";
 import path from "path";
 import handlebars from "handlebars";
 import httpStatus from "http-status";
-import { ISendEmail } from "../../app/modules";
-import { config, transporter, infoLogger, ApiError } from "../../config";
+import { ISendEmail } from "../../../app/modules";
+import { config, transporter, infoLogger, ApiError } from "../../../config";
 
-// @helper: Add template caching mechanism
+// @desc: Add template caching mechanism
 const templateCache: Record<string, HandlebarsTemplateDelegate> = {};
 
 // @helper: Render template
-export const renderTemplate = (templateName: string, data: object) => {
-    // Check if template is already cached
-    if (!templateCache[templateName]) {
-        const filePath = path.resolve(
-            process.cwd(),
-            "app",
-            "views",
-            `${templateName}.template.hbs`
-        );
+export const renderTemplate = (templateName: string, data: object, isUseCache = true) => {
+    let template: Handlebars.TemplateDelegate;
+
+    if (isUseCache && templateCache[templateName]) {
+        template = templateCache[templateName];
+    } else {
+        const filePath = path.resolve(process.cwd(), "app", "views", `${templateName}.template.hbs`);
         const source = fs.readFileSync(filePath, "utf8");
-        templateCache[templateName] = handlebars.compile(source);
+        template = handlebars.compile(source);
+        if (isUseCache)
+            templateCache[templateName] = template;
     }
-    return templateCache[templateName](data);
+
+    return template(data);
 };
+
 
 // Verify once at startup or periodically, not for every email
 let transporterVerified = false;
