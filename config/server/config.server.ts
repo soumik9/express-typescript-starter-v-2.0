@@ -1,76 +1,47 @@
 import z from "zod";
+import { ServerEnvironmentEnum } from "../../libs/enum";
 import { loadEnvironmentVariables, validateEnvVariables } from "../../libs/helper/core/env.helper";
 
 // Load environment variables before defining config
 loadEnvironmentVariables();
 
+const requiredString = (msg: string) => z.string().nonempty({ error: msg });
+const requiredNumber = (msg: string) => z.string().nonempty({ error: msg }).transform((v) => Number(v));
+
 // Define required environment variables
 const EnvSchema = z.object({
-    NODE_ENV: z
-        .enum(['development', 'test', 'production']).default('development'),
-    PORT: z
-        .string()
-        .nonempty({ message: "PORT is required." }),
+    NODE_ENV: z.enum(Object.values(ServerEnvironmentEnum)).default(ServerEnvironmentEnum.Development),
+    PORT: requiredString("PORT is required."),
 
-    TOKEN_SECRET: z
-        .string()
-        .nonempty({ message: "Token secret is required." }),
-    TOKEN_SECRET_EXP: z
-        .string()
-        .nonempty({ message: "Token secret expiration is required." }),
+    // Token
+    TOKEN_SECRET: requiredString("Token secret is required."),
+    TOKEN_SECRET_EXPIRES_IN: requiredString("Token secret expiration is required."),
 
-    BCRYPT_SALT_ROUND: z
-        .string()
-        .nonempty({ message: "Bcrypt salt round is required." }),
+    // Hashing
+    BCRYPT_SALT_ROUND: requiredNumber("Bcrypt salt round is required."),
 
+    // Database
+    MONGODB_URI: requiredString("Mongo URI is required."),
+    MONGODB_DATABASE_NAME: requiredString("MongoDB database name is required."),
 
-    MONGODB_URI: z
-        .string()
-        .nonempty({ message: "Mongo URI is required." }),
+    // URLs
+    BASE_URL: requiredString("Base URL is required."),
+    CLIENT_BASE_URL: requiredString("Client base URL is required."),
 
-    MONGODB_DATABASE_NAME: z
-        .string()
-        .nonempty({ message: "MongoDB database name is required." }),
+    // Default Admin
+    DEFAULT_ADMIN_EMAIL: requiredString("Default admin email is required."),
+    DEFAULT_ADMIN_PASSWORD: requiredString("Default admin password is required."),
+    DEFAULT_ADMIN_ROLE: requiredString("Default admin role is required."),
 
-    BASE_URL: z
-        .string()
-        .nonempty({ message: "Base URL is required." }),
-    CLIENT_BASE_URL: z
-        .string()
-        .nonempty({ message: "Client base URL is required." }),
+    // Mail
+    EMAIL_ID: requiredString("Email ID is required."),
+    EMAIL_PASSWORD: requiredString("Email password is required."),
+    EMAIL_HOST: requiredString("Email host is required."),
+    EMAIL_PORT: requiredNumber("Email port is required."),
+    EMAIL_NAME: requiredString("Email name is required."),
+    EMAIL_FROM: requiredString("Email from address is required."),
 
-    DEFAULT_ADMIN_PHONE: z
-        .string()
-        .nonempty({ message: "Default admin phone is required." }),
-    DEFAULT_ADMIN_PASSWORD: z
-        .string()
-        .nonempty({ message: "Default admin password is required." }),
-    DEFAULT_ADMIN_ROLE: z
-        .string()
-        .nonempty({ message: "Default admin role is required." }),
-
-    EMAIL_ID: z
-        .string()
-        .nonempty({ message: "Email ID is required." }),
-    EMAIL_PASSWORD: z
-        .string()
-        .nonempty({ message: "Email password is required." }),
-    EMAIL_HOST: z
-        .string()
-        .nonempty({ message: "Email host is required." }),
-    EMAIL_PORT: z
-        .string()
-        .nonempty({ message: "Email port is required." }),
-    EMAIL_NAME: z
-        .string()
-        .nonempty({ message: "Email name is required." }),
-    EMAIL_FROM: z
-        .string()
-        .nonempty({ message: "Email from address is required." }),
-
-    CACHE_API_AUTHORIZED: z
-        .string()
-        .nonempty({ message: "Cache API authorized key is required." }),
+    CACHE_API_AUTHORIZED_KEY: requiredString("Cache API authorized key is required."),
 });
 
 // Validate environment variables
@@ -82,7 +53,7 @@ export const config = {
     ENV: parsedConfig.NODE_ENV || 'development',
     TOKEN: {
         SECRET: parsedConfig.TOKEN_SECRET,
-        EXPIRES_IN: parsedConfig.TOKEN_SECRET_EXP,
+        EXPIRES_IN: parsedConfig.TOKEN_SECRET_EXPIRES_IN,
     },
     BCRYPT: {
         SALT_ROUND: parsedConfig.BCRYPT_SALT_ROUND,
@@ -108,7 +79,7 @@ export const config = {
 
     SEEDER: {
         DEFAULT_ADMIN: {
-            PHONE: parsedConfig.DEFAULT_ADMIN_PHONE,
+            EMAIL: parsedConfig.DEFAULT_ADMIN_EMAIL,
             PASSWORD: parsedConfig.DEFAULT_ADMIN_PASSWORD,
             ROLE: parsedConfig.DEFAULT_ADMIN_ROLE,
         },

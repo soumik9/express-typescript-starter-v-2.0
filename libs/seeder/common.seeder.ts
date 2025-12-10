@@ -6,7 +6,7 @@ export const seedDefaultAdmin = async () => {
 
         const adminSeederData = {
             name: "Admin",
-            phone: config.SEEDER.DEFAULT_ADMIN.PHONE,
+            email: config.SEEDER.DEFAULT_ADMIN.EMAIL,
             password: config.SEEDER.DEFAULT_ADMIN.PASSWORD,
             role: config.SEEDER.DEFAULT_ADMIN.ROLE,
             country: {
