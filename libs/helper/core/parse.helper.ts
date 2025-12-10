@@ -1,31 +1,47 @@
-// @helper: parseQueryData function
-export const handleParseQuery = (query: any): {
-    page: number; limit: number;
-    [key: string]: string | number;
-} => {
+// services/QueryParser.service.ts
+export interface IParsedQuery {
+    page: number;
+    limit: number;
+    [key: string]: string | number | null;
+}
 
-    //pagination
-    const page = query.page ? parseInt(query.page as string, 10) : 1;
-    const limit = query.limit ? parseInt(query.limit as string, 10) : 999999;
+export class ParserService {
+    private static instance: ParserService;
 
-    const status = query.status ? query.status.toString() : null;
-    const search = query.search ? query.search.toString() : null;
+    private constructor() { }
 
-    const result: Record<string, string | number | boolean | null> = {};
+    /** Singleton accessor */
+    public static getInstance(): ParserService {
+        if (!ParserService.instance) {
+            ParserService.instance = new ParserService();
+        }
+        return ParserService.instance;
+    }
 
-    // string query parameters
-    const stringKeys = ["admin_id"];
+    /**
+     * Parse query parameters with pagination and optional string fields
+     * @param query Express request query object
+     */
+    public parse(query: Record<string, any>): IParsedQuery {
+        // Default pagination
+        const page = query.page ? parseInt(query.page as string, 10) : 1;
+        const limit = query.limit ? parseInt(query.limit as string, 10) : 999999;
 
-    stringKeys.forEach((key) => {
-        result[key] = query[key] ? query[key].toString() : "";
-    });
+        // Optional string keys that should always be string
+        const stringKeys = ["admin_id"];
+        const extra: Record<string, string> = {};
 
-    return {
-        page,
-        limit,
+        stringKeys.forEach((key) => {
+            extra[key] = query[key] ? query[key].toString() : "";
+        });
 
-        status,
-        search,
-        ...result,
+        return {
+            page,
+            limit,
+            ...extra,
+        };
     }
 }
+
+// Export singleton instance
+export const ParserServiceInstance = ParserService.getInstance();

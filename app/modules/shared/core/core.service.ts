@@ -5,8 +5,7 @@ import { Application, Request, Response } from 'express';
 import { cacheViewerEmailTeamplateStyles } from '../../../../libs/style';
 import { ApiError, config, errorLogger, infoLogger } from '../../../../config';
 import { EmailTemplateEnum, ServerEnvironmentEnum } from '../../../../libs/enum';
-import { getRequestFulllUrl, getServerHealth, LocalCache, } from '../../../../libs/helper';
-import { ResponseServiceInstance, EmailServiceInstance, } from '../../../../libs/helper/core';
+import { ResponseServiceInstance, EmailServiceInstance, ServerUtilityServiceInstance, LocalCache } from '../../../../libs/helper/core';
 
 // @service: home route
 export const handleWelcomeRoute = (req: Request, res: Response) => {
@@ -26,8 +25,8 @@ export const handleWelcomeRoute = (req: Request, res: Response) => {
 
 // @service: Health route
 export const handleHealthRoute = (app: Application) => {
-    return (req: Request, res: Response) => {
-        const healthData = getServerHealth(app);
+    return async (req: Request, res: Response) => {
+        const healthData = await ServerUtilityServiceInstance.getHealth(app);
 
         // Render HTML or JSON
         if (req.query.format === "json") {
@@ -53,7 +52,7 @@ export const handleRouteNotFound = (req: Request, res: Response) => {
         templateName: EmailTemplateEnum.NotFound,
         data: {
             original_url: req.originalUrl,
-            full_url: getRequestFulllUrl(req),
+            full_url: ServerUtilityServiceInstance.url(req),
         }
     });
 
