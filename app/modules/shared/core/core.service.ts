@@ -5,13 +5,17 @@ import { Application, Request, Response } from 'express';
 import { cacheViewerEmailTeamplateStyles } from '../../../../libs/style';
 import { ApiError, config, errorLogger, infoLogger } from '../../../../config';
 import { EmailTemplateEnum, ServerEnvironmentEnum } from '../../../../libs/enum';
-import { catchAsync, getRequestFulllUrl, getServerHealth, LocalCache, renderTemplate, sendErrorResponse, sendSuccessResponse } from '../../../../libs/helper';
+import { getRequestFulllUrl, getServerHealth, LocalCache, } from '../../../../libs/helper';
+import { catchAsync, EmailServiceInstance, sendErrorResponse, sendSuccessResponse } from '../../../../libs/helper/core';
 
 // @service: home route
 export const handleWelcomeRoute = (req: Request, res: Response) => {
-    const htmlContent = renderTemplate(EmailTemplateEnum.Home, {
-        title: "Backend",
-        explore_url: "https://soumikahammed.com/",
+    const htmlContent = EmailServiceInstance.renderTemplate({
+        templateName: EmailTemplateEnum.Home,
+        data: {
+            title: "Backend",
+            explore_url: "https://soumikahammed.com/",
+        }
     });
 
     res
@@ -31,7 +35,10 @@ export const handleHealthRoute = (app: Application) => {
                 .status(healthData.isReady ? httpStatus.OK : httpStatus.SERVICE_UNAVAILABLE)
                 .json(healthData);
         } else {
-            const htmlContent = renderTemplate(EmailTemplateEnum.Health, healthData);
+            const htmlContent = EmailServiceInstance.renderTemplate({
+                templateName: EmailTemplateEnum.Health,
+                data: healthData,
+            })
             res
                 .setHeader("Content-Type", "text/html; charset=utf-8")
                 .status(healthData.isReady ? httpStatus.OK : httpStatus.SERVICE_UNAVAILABLE)
@@ -42,9 +49,12 @@ export const handleHealthRoute = (app: Application) => {
 
 // @service: not found
 export const handleRouteNotFound = (req: Request, res: Response) => {
-    const htmlContent = renderTemplate(EmailTemplateEnum.NotFound, {
-        original_url: req.originalUrl,
-        full_url: getRequestFulllUrl(req),
+    const htmlContent = EmailServiceInstance.renderTemplate({
+        templateName: EmailTemplateEnum.NotFound,
+        data: {
+            original_url: req.originalUrl,
+            full_url: getRequestFulllUrl(req),
+        }
     });
 
     res
@@ -148,12 +158,15 @@ export const handleLocalCache = catchAsync(
             value: JSON.stringify(value, null, 2)
         }));
 
-
-        const htmlContent = renderTemplate(EmailTemplateEnum.CacheViewer, { // Use a specific template name
-            title: "Cache Viewer",
-            cacheEntries: cacheEntries,
-            styles: cacheViewerEmailTeamplateStyles,
-        }, false);
+        const htmlContent = EmailServiceInstance.renderTemplate({
+            templateName: EmailTemplateEnum.CacheViewer,
+            data: {
+                title: "Cache Viewer",
+                cacheEntries: cacheEntries,
+                styles: cacheViewerEmailTeamplateStyles,
+            },
+            useCache: false,
+        });
 
         res
             .setHeader("Content-Type", "text/html; charset=utf-8")

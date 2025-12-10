@@ -1,75 +1,118 @@
 import fs from "fs";
 import path from "path";
-import handlebars from "handlebars";
 import httpStatus from "http-status";
-import { ISendEmail } from "../../../app/modules";
+import { zodSchemaValidate } from "../utils";
+import { ServerEnvironmentEnum } from "../../enum";
+import handlebars, { TemplateDelegate } from "handlebars";
+import { ISendEmail, SendEmailSchema } from "../../../app/modules";
 import { config, transporter, infoLogger, ApiError } from "../../../config";
 
-// @desc: Add template caching mechanism
-const templateCache: Record<string, HandlebarsTemplateDelegate> = {};
+export class EmailService {
+    private static instance: EmailService;
+    private templateCache: Record<string, TemplateDelegate> = {};
+    private transporterVerified = false;
 
-// @helper: Render template
-export const renderTemplate = (templateName: string, data: object, isUseCache = true) => {
-    let template: Handlebars.TemplateDelegate;
+    private constructor(private useCache: boolean = true) { }
 
-    if (isUseCache && templateCache[templateName]) {
-        template = templateCache[templateName];
-    } else {
-        const filePath = path.resolve(process.cwd(), "app", "views", `${templateName}.template.hbs`);
-        const source = fs.readFileSync(filePath, "utf8");
-        template = handlebars.compile(source);
-        if (isUseCache)
-            templateCache[templateName] = template;
+    /** Singleton accessor */
+    public static getInstance(useCache: boolean = true): EmailService {
+        if (!EmailService.instance) {
+            EmailService.instance = new EmailService(useCache);
+        }
+        return EmailService.instance;
     }
 
-    return template(data);
-};
-
-
-// Verify once at startup or periodically, not for every email
-let transporterVerified = false;
-
-// @helper: Send mail
-export const sendEmail = async (payload: ISendEmail) => {
-
-    const { toEmail, subject, template, data, fromEmail } = payload;
-
-    // Step 1: Check if the email is valid
-    if (!toEmail)
-        throw new ApiError(httpStatus.BAD_REQUEST, "TO Email is required");
-
-    // Step 2: Check if the subject is valid
-    if (!subject)
-        throw new ApiError(httpStatus.BAD_REQUEST, "Subject is required");
-
-    // Step 3: Check if the template is valid
-    if (!template)
-        throw new ApiError(httpStatus.BAD_REQUEST, "Template is required");
-
-    try {
-        if (!transporterVerified) {
-            await transporter.verify();
-            transporterVerified = true;
-            infoLogger.info(`Server is ready to take our messages`);
+    /** Render a Handlebars template with optional caching */
+    public renderTemplate({
+        templateName, data, useCache = true
+    }: {
+        templateName: string, data: Record<string, any>, useCache?: boolean
+    }): string {
+        if (this.useCache && this.templateCache[templateName]) {
+            return this.templateCache[templateName](data);
         }
 
-        const htmlContent = renderTemplate(template, data);
-        if (!htmlContent)
-            throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Template not found");
+        const env = config.ENV ?? ServerEnvironmentEnum.Development;
+        const viewsBase =
+            env === ServerEnvironmentEnum.Development
+                ? path.resolve(process.cwd(), "app", "views")
+                : path.resolve(process.cwd(), "views");
 
-        const response = await transporter.sendMail({
-            from: fromEmail ? fromEmail : config.MAIL.FROM,
-            to: toEmail,
-            subject: subject,
-            html: htmlContent,
-        });
+        const filePath = path.join(viewsBase, `${templateName}.template.hbs`);
 
-        infoLogger.info(`Message sent: ${toEmail} with ID: ${response.messageId}`);
-        return response;
-    } catch (error) {
-        throw new ApiError(
-            httpStatus.INTERNAL_SERVER_ERROR,
-            `Failed to send email: ${error instanceof Error ? error.message : 'unknown'}`
-        );
+        if (!fs.existsSync(filePath)) {
+            throw new ApiError(
+                httpStatus.NOT_FOUND,
+                `Template "${templateName}" not found at path: ${filePath}`
+            );
+        }
+
+        const source = fs.readFileSync(filePath, "utf8");
+        const template = handlebars.compile(source);
+
+        if (useCache) {
+            this.templateCache[templateName] = template;
+        }
+
+        return template(data);
     }
-};
+
+    /** Ensure transporter is verified once */
+    private async verifyTransporter() {
+        if (!this.transporterVerified) {
+            await transporter.verify();
+            this.transporterVerified = true;
+            infoLogger.info("Mail server is ready to send messages");
+        }
+    }
+
+    /** Send email with template rendering */
+    public async sendEmail({
+        payload, useCache = this.useCache }: {
+            payload: ISendEmail, useCache?: boolean
+        }): Promise<any> {
+
+        const validatedPayload = zodSchemaValidate(SendEmailSchema, payload);
+        const { toEmail, subject, template, data, fromEmail } = validatedPayload;
+
+        try {
+            await this.verifyTransporter();
+
+            const htmlContent = this.renderTemplate({
+                templateName: template,
+                data: data || {},
+                useCache: useCache ?? this.useCache
+            });
+            if (!htmlContent) {
+                throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Template not found");
+            }
+
+            const response = await transporter.sendMail({
+                from: fromEmail ?? config.MAIL.FROM,
+                to: toEmail,
+                subject,
+                html: htmlContent,
+            });
+
+            infoLogger.info(`Email sent to ${toEmail} | Message ID: ${response.messageId}`);
+            return response;
+        } catch (error) {
+            throw new ApiError(
+                httpStatus.INTERNAL_SERVER_ERROR,
+                `Failed to send email: ${error instanceof Error ? error.message : "unknown"}`
+            );
+        }
+    }
+
+    /** Clear cached templates */
+    public clearCache(templateName?: string) {
+        if (templateName) {
+            delete this.templateCache[templateName];
+        } else {
+            this.templateCache = {};
+        }
+    }
+}
+
+// Export singleton
+export const EmailServiceInstance = EmailService.getInstance();

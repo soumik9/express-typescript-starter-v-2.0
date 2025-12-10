@@ -10,6 +10,7 @@ export interface ISendEmail {
     subject: string;
     template: string;
     data: object;
+    isUseCache?: boolean;
 }
 
 export interface IPhoneCountry {

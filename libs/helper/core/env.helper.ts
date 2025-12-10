@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import dotenv from 'dotenv';
+import { ServerEnvironmentEnum } from "../../enum";
 
 /**
  * dont use errorLogger here, because it may not be defined yet
@@ -18,7 +19,7 @@ export const loadEnvironmentVariables = (): void => {
     }
 
     // Now determine the NODE_ENV value (default to 'development' if not set)
-    const NODE_ENV = process.env.NODE_ENV || 'development';
+    const NODE_ENV = process.env.NODE_ENV || ServerEnvironmentEnum.Development;
 
     // Determine which env file to use based on environment
     const envFiles = {
