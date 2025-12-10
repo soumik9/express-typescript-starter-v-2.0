@@ -1,0 +1,33 @@
+<body style="{{styles.body}}">
+    <header style="{{styles.header}}">
+        <h1 style="font-size: 1.5em; margin: 0">{{title}}</h1>
+    </header>
+
+    <div style="{{styles.cache_container}}">
+        <div style="{{styles.key_list_panel}}">
+            <div style="{{styles.filter_bar}}">
+                <input type="text" id="key-filter" style="{{styles.filter_input}}"
+                    placeholder="Filter keys ({{cacheEntries.length}} total)">
+            </div>
+
+            <div id="cache-list" data-base-style="{{styles.cache_key}}" data-active-style="{{styles.cache_key_active}}">
+                {{#each cacheEntries}}
+                <div class="cache-key" data-key="{{key}}" data-value='{{value}}' style="{{../styles.cache_key}}">
+                    {{key}}
+                </div>
+                {{/each}}
+            </div>
+        </div>
+
+        <div style="{{styles.detail_view_panel}}">
+            <h2 id="detail-heading" style="{{styles.detail_heading}}">Key Details</h2>
+
+            <p id="initial-message">Click a key on the left to view its value.</p>
+            <div id="detail-content">
+                <pre id="detail-pre" style="{{styles.detail_pre}}"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script src="/public/js/cache_viewer.js"></script>
+</body>

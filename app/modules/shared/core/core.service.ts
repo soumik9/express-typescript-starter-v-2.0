@@ -2,9 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import httpStatus from 'http-status';
 import { Application, Request, Response } from 'express';
+import { cacheViewerEmailTeamplateStyles } from '../../../../libs/style';
 import { ApiError, config, errorLogger, infoLogger } from '../../../../config';
 import { EmailTemplateEnum, ServerEnvironmentEnum } from '../../../../libs/enum';
-import { catchAsync, getRequestFulllUrl, getServerHealth, renderTemplate, sendErrorResponse, sendSuccessResponse } from '../../../../libs/helper';
+import { catchAsync, getRequestFulllUrl, getServerHealth, LocalCache, renderTemplate, sendErrorResponse, sendSuccessResponse } from '../../../../libs/helper';
 
 // @service: home route
 export const handleWelcomeRoute = (req: Request, res: Response) => {
@@ -124,5 +125,39 @@ export const handleGenerateModule = catchAsync(
                 skipped_files: skipped,
             }
         });
+    }
+);
+
+// local cache test route
+export const handleLocalCache = catchAsync(
+    async (req: Request, res: Response) => {
+
+        // Restrict access in non-development environments
+        if (config.ENV !== ServerEnvironmentEnum.Development) {
+            const { key } = req.query;
+            if (key !== config.KEY.CACHE_API_AUTHORIZED) {
+                throw new ApiError(httpStatus.FORBIDDEN, "You can not access this endpoint.");
+            }
+        }
+
+        const result = LocalCache.getAll();
+
+        // Convert the cache object into an array of {key, value} for easier iteration in Handlebars
+        const cacheEntries = Object.entries(result).map(([key, value]) => ({
+            key,
+            value: JSON.stringify(value, null, 2)
+        }));
+
+
+        const htmlContent = renderTemplate(EmailTemplateEnum.CacheViewer, { // Use a specific template name
+            title: "Cache Viewer",
+            cacheEntries: cacheEntries,
+            styles: cacheViewerEmailTeamplateStyles,
+        }, false);
+
+        res
+            .setHeader("Content-Type", "text/html; charset=utf-8")
+            .status(httpStatus.OK)
+            .send(htmlContent);
     }
 );

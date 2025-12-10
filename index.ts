@@ -2,7 +2,7 @@ import { MainRoutes } from './app/routes';
 import { bootstrap, handleGlobalErrors } from './config';
 import { handleCheckPublicFileExists, serverMiddlewares } from './app/middleware';
 import express, { Application, ErrorRequestHandler, NextFunction, Request, Response } from 'express';
-import { handleGenerateModule, handleHealthRoute, handleRouteNotFound, handleWelcomeRoute } from './app/modules';
+import { handleGenerateModule, handleHealthRoute, handleLocalCache, handleRouteNotFound, handleWelcomeRoute } from './app/modules';
 
 const app: Application = express();
 
@@ -13,10 +13,11 @@ serverMiddlewares(app);
 app.use('/public', handleCheckPublicFileExists, express.static('public'));
 
 // Welcome route
-// Welcome route
 app.get("/", handleWelcomeRoute);
 app.get("/healthz", handleHealthRoute(app));
 app.get("/generate-module", handleGenerateModule);
+
+app.get("/local-cache", handleLocalCache);
 
 // all routes
 app.use('/api/v1', MainRoutes);

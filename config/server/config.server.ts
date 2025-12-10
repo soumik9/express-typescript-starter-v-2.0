@@ -66,7 +66,11 @@ const EnvSchema = z.object({
         .nonempty({ message: "Email name is required." }),
     EMAIL_FROM: z
         .string()
-        .nonempty({ message: "Email from address is required." })
+        .nonempty({ message: "Email from address is required." }),
+
+    CACHE_API_AUTHORIZED: z
+        .string()
+        .nonempty({ message: "Cache API authorized key is required." }),
 });
 
 // Validate environment variables
@@ -108,5 +112,9 @@ export const config = {
             PASSWORD: parsedConfig.DEFAULT_ADMIN_PASSWORD,
             ROLE: parsedConfig.DEFAULT_ADMIN_ROLE,
         },
-    }
+    },
+
+    KEY: {
+        CACHE_API_AUTHORIZED: parsedConfig.CACHE_API_AUTHORIZED,
+    },
 };
