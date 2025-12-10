@@ -1,10 +1,9 @@
 import cors from 'cors'
 import moment from 'moment';
 import helmet from "helmet";
-import { getRequestFulllUrl } from '../../libs/helper';
-import { httpLogger, multerUpload } from '../../config';
 import { handleParseRequestBody } from './parser.middleware';
 import express, { Application, NextFunction, Request, Response } from 'express';
+import { config, errorLogger, handleFileCompression, httpLogger, multerUpload } from '../../config';
 
 // @middleware: request Log Middleware
 const handleRequestLog = (req: Request, res: Response, next: NextFunction) => {
@@ -15,7 +14,7 @@ const handleRequestLog = (req: Request, res: Response, next: NextFunction) => {
         const endTime = moment();
         const duration = endTime.diff(startTime);
         const formattedDuration = moment.duration(duration).asMilliseconds();
-        const message = `${method} ${getRequestFulllUrl(req)} ${res.statusCode} - ${formattedDuration}ms`;
+        const message = `${method} ${config.URL.BASE + req.originalUrl} ${res.statusCode} - ${formattedDuration}ms`;
         httpLogger.http(message);
     });
 
@@ -32,6 +31,20 @@ export const serverMiddlewares = (app: Application) => {
         crossOriginResourcePolicy: { policy: 'cross-origin' },
     }));
 
+    // Add global compression middleware after multer
+    app.use(async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            if (req.files && Object.keys(req.files).length > 0) {
+                await handleFileCompression(req.files as any);
+            }
+            next();
+        } catch (err) {
+            errorLogger.error(`Global file compression error: ${err instanceof Error ? err.message : String(err)}`);
+            next(err);
+        }
+    });
+
+
     // multer configure
     app.use(
         multerUpload.fields([
@@ -43,4 +56,3 @@ export const serverMiddlewares = (app: Application) => {
     app.use(handleRequestLog);
     app.use(handleParseRequestBody);
 };
-

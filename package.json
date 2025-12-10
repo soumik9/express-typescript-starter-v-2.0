@@ -6,7 +6,8 @@
   "author": "Soumik Ahammed",
   "scripts": {
     "start": "node dist/index.js",
-    "build": "tsc",
+    "clean": "rimraf dist",
+    "build": "yarn clean && tsc && yarn copy-views",
     "dev": "ts-node-dev --respawn --transpile-only index.ts",
     "start-dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -25,6 +26,7 @@
     "mongoose": "^8.9.3",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^7.0.3",
+    "sharp": "^0.34.5",
     "validator": "^13.12.0",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0",
@@ -41,6 +43,8 @@
     "@types/nodemailer": "^6.4.17",
     "@types/sanitize-html": "^2.16.0",
     "@types/validator": "^13.12.2",
+    "cpx": "^1.5.0",
+    "rimraf": "^6.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
   }

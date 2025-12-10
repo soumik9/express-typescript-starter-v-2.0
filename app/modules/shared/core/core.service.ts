@@ -2,9 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import httpStatus from 'http-status';
 import { Application, Request, Response } from 'express';
-import { ApiError, config, errorLogger, infoLogger } from '../../../config';
-import { EmailTemplateEnum, ServerEnvironmentEnum } from '../../../libs/enum';
-import { catchAsync, getRequestFulllUrl, getServerHealth, renderTemplate, sendErrorResponse, sendSuccessResponse } from '../../../libs/helper';
+import { ApiError, config, errorLogger, infoLogger } from '../../../../config';
+import { EmailTemplateEnum, ServerEnvironmentEnum } from '../../../../libs/enum';
+import { catchAsync, getRequestFulllUrl, getServerHealth, renderTemplate, sendErrorResponse, sendSuccessResponse } from '../../../../libs/helper';
 
 // @service: home route
 export const handleWelcomeRoute = (req: Request, res: Response) => {

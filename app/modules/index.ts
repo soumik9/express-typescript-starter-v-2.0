@@ -1,5 +1,2 @@
-export * from './auth';
-export * from './user';
-export * from './admin';
-export * from './common';
-export * from './core';
+export * from './shared/common';
+export * from './shared/core';

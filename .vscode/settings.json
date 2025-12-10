@@ -1,5 +1,5 @@
 {
-    "editor.defaultFormatter": null,
+    "editor.defaultFormatter": "vscode.typescript-language-features",
     "editor.autoIndent": "full",
     "editor.autoIndentOnPaste": false,
     "editor.tabSize": 4,
@@ -8,17 +8,17 @@
     "editor.formatOnType": false,
     // Enable/Disable specific language features
     "[javascript]": {
-        "editor.defaultFormatter": null, // No formatter for JavaScript
+        "editor.defaultFormatter": "vscode.typescript-language-features", // No formatter for JavaScript
         "editor.formatOnSave": true, // No auto-formatting for JavaScript files
         "editor.tabSize": 4
     },
     "[json]": {
-        "editor.defaultFormatter": null,
+        "editor.defaultFormatter": "vscode.json-language-features",
         "editor.formatOnSave": true,
         "editor.tabSize": 2
     },
     "[typescript]": {
-        "editor.defaultFormatter": null, // No formatter for TypeScript
+        "editor.defaultFormatter": "vscode.typescript-language-features", // No formatter for TypeScript
         "editor.formatOnSave": true, // No auto-formatting for TypeScript files
         "editor.tabSize": 4
     },
