@@ -1,9 +1,13 @@
 import cors from 'cors'
 import moment from 'moment';
 import helmet from "helmet";
+import passport from 'passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
 import { handleParseRequestBody } from './parser.middleware';
 import express, { Application, NextFunction, Request, Response } from 'express';
 import { config, errorLogger, handleFileCompression, httpLogger, multerUpload } from '../../config';
+import { PassportKeyEnum } from '../../libs/enum';
+import { passportJwtVerify } from '../../libs/helper';
 
 // @middleware: request Log Middleware
 const handleRequestLog = (req: Request, res: Response, next: NextFunction) => {
@@ -55,4 +59,11 @@ export const serverMiddlewares = (app: Application) => {
 
     app.use(handleRequestLog);
     app.use(handleParseRequestBody);
+
+    passport.use(PassportKeyEnum.JwtAuth, new Strategy({
+        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+        secretOrKey: config.TOKEN.SECRET,
+    }, passportJwtVerify));
+
+    app.use(passport.initialize());
 };

@@ -3,14 +3,14 @@ import { config } from '../server';
 import ApiError from './api.error';
 import httpStatus from 'http-status';
 import { MulterError } from 'multer';
+import { errorLogger } from '../logger';
 import handleZodError from './zod.error';
 import handleCastError from './cast.error';
 import { IErrorMessage } from '../../app/modules';
+import { sendErrorResponse } from '../../libs/helper';
 import handleValidationError from './validation.error';
 import { ServerEnvironmentEnum } from '../../libs/enum';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
-import { errorLogger } from '../logger';
-import { sendErrorResponse } from '../../libs/helper';
 
 type KnownErrors = 'ValidationError' | 'CastError' | 'TokenExpiredError' | 'JsonWebTokenError';
 
@@ -80,7 +80,6 @@ const handleGlobalErrors: ErrorRequestHandler = (
         errorMessages = [{ path: '', message: 'Something went wrong' }];
     }
 
-    // show the error
     // show the error
     if (config.ENV !== ServerEnvironmentEnum.Production) {
         errorLogger.error(`[ERROR] : ${error.message}`);

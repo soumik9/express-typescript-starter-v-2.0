@@ -5,8 +5,9 @@ import { IUser } from '../../user';
 declare global {
     namespace Express {
         interface Request {
-            user?: Partial<IUser>;
             files?: Express.Multer.File[] | Express.Multer.File;
+            admin?: any;
+            customer?: any;
         }
     }
 }

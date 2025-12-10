@@ -14,8 +14,9 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: true # This ensures that if one job in the matrix fails, all others are immediately cancelled.
       matrix:
-        node-version: [18.x, 20.x, 22.x, node] # node to use latest LTS or current version
+        node-version: [20.x, 22.x, 24.x, node] # node to use latest LTS or current version
 
     steps:
     - name: Checkout repository

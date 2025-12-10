@@ -1,9 +1,3 @@
-export enum EnvironmentEnum {
-    Development = 'development',
-    Staging = 'staging',
-    Production = 'production',
-}
-
 export enum AdminRoleEnum {
     Admin = 'admin',
 }
@@ -16,6 +10,7 @@ export enum FnFileReturnTypeEnum {
 export enum ServerEnvironmentEnum {
     Development = 'development',
     Production = 'production',
+    Test = 'test',
 }
 
 export enum CacheTimeEnum {
@@ -24,4 +19,8 @@ export enum CacheTimeEnum {
     OneDay = 86400,
     OneWeek = 604800,
     OneMonth = 2592000,
+}
+
+export enum PassportKeyEnum {
+    JwtAuth = 'jwt-auth',
 }
