@@ -6,7 +6,7 @@ import { cacheViewerEmailTeamplateStyles } from '../../../../libs/style';
 import { ApiError, config, errorLogger, infoLogger } from '../../../../config';
 import { EmailTemplateEnum, ServerEnvironmentEnum } from '../../../../libs/enum';
 import { getRequestFulllUrl, getServerHealth, LocalCache, } from '../../../../libs/helper';
-import { catchAsync, EmailServiceInstance, sendErrorResponse, sendSuccessResponse } from '../../../../libs/helper/core';
+import { ResponseServiceInstance, EmailServiceInstance, } from '../../../../libs/helper/core';
 
 // @service: home route
 export const handleWelcomeRoute = (req: Request, res: Response) => {
@@ -64,7 +64,7 @@ export const handleRouteNotFound = (req: Request, res: Response) => {
 };
 
 // @service: generate module
-export const handleGenerateModule = catchAsync(
+export const handleGenerateModule = ResponseServiceInstance.catchAsync(
     async (req: Request, res: Response) => {
         if (config.ENV !== ServerEnvironmentEnum.Development)
             throw new ApiError(httpStatus.FORBIDDEN, "You can not access this endpoint.");
@@ -72,7 +72,7 @@ export const handleGenerateModule = catchAsync(
         const { folder_name, prefix, panel } = req.query as { [key: string]: string };
 
         if (!folder_name || !prefix) {
-            sendErrorResponse(res, {
+            ResponseServiceInstance.error(res, {
                 statusCode: httpStatus.BAD_REQUEST,
                 message: "Please provide folder name and prefix",
                 errorMessages: [],
@@ -89,7 +89,7 @@ export const handleGenerateModule = catchAsync(
                 baseDir = path.join(process.cwd(), "app", "modules", "app_panel");
                 break;
             default:
-                return sendErrorResponse(res, {
+                return ResponseServiceInstance.error(res, {
                     statusCode: httpStatus.BAD_REQUEST,
                     message: "Invalid panel type. Must be 'admin' or 'app'.",
                     errorMessages: [],
@@ -125,7 +125,7 @@ export const handleGenerateModule = catchAsync(
             }
         });
 
-        return sendSuccessResponse(res, {
+        return ResponseServiceInstance.success(res, {
             statusCode: httpStatus.OK,
             success: true,
             message: "Module files generated successfully",
@@ -139,7 +139,7 @@ export const handleGenerateModule = catchAsync(
 );
 
 // local cache test route
-export const handleLocalCache = catchAsync(
+export const handleLocalCache = ResponseServiceInstance.catchAsync(
     async (req: Request, res: Response) => {
 
         // Restrict access in non-development environments

@@ -1,9 +1,9 @@
 import z from "zod";
 import { ServerEnvironmentEnum } from "../../libs/enum";
-import { loadEnvironmentVariables, validateEnvVariables } from "../../libs/helper/core/env.helper";
+import { EnvServiceInstance } from "../../libs/helper";
 
-// Load environment variables before defining config
-loadEnvironmentVariables();
+// Load env
+EnvServiceInstance.load();
 
 const requiredString = (msg: string) => z.string().nonempty({ error: msg });
 const requiredNumber = (msg: string) => z.string().nonempty({ error: msg }).transform((v) => Number(v));
@@ -45,7 +45,7 @@ const EnvSchema = z.object({
 });
 
 // Validate environment variables
-const parsedConfig = validateEnvVariables(EnvSchema);
+const parsedConfig = EnvServiceInstance.validate(EnvSchema);
 
 // Export the environment variables
 export const config = {
