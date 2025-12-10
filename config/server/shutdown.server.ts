@@ -1,7 +1,8 @@
 import { Server } from "http";
 import { errorLogger, httpLogger, infoLogger } from "../logger";
 import { disconnectFromDatabase } from "./database.server";
-import { handleProcessError } from "../errors";
+import { ErrorHandlerInstance } from "../errors";
+
 
 // @server: Register signal handlers for graceful shutdown
 export const registerSignalHandlers = (server: Server) => {
@@ -11,8 +12,8 @@ export const registerSignalHandlers = (server: Server) => {
         process.on(signal, () => shutdownServerGracefully(server, signal));
     });
 
-    process.on('uncaughtException', handleProcessError('uncaughtException'));
-    process.on('unhandledRejection', handleProcessError('unhandledRejection'));
+    process.on('uncaughtException', ErrorHandlerInstance.process('uncaughtException'));
+    process.on('unhandledRejection', ErrorHandlerInstance.process('unhandledRejection'));
 };
 
 export const shutdownServerGracefully = async (server: Server, signal: string) => {

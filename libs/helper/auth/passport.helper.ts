@@ -1,7 +1,7 @@
 import httpStatus from "http-status";
 import { JwtPayload } from "jsonwebtoken";
-import { ApiError } from "../../../config";
 import { Model, Document } from "mongoose";
+import { ApiError } from "../../../config";
 
 export class PassportService<T extends Document> {
     private static instances: Map<string, PassportService<any>> = new Map();

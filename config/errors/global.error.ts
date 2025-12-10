@@ -1,15 +1,12 @@
 import { ZodError } from 'zod';
 import { config } from '../server';
-import ApiError from './api.error';
 import httpStatus from 'http-status';
 import { MulterError } from 'multer';
 import { errorLogger } from '../logger';
-import handleZodError from './zod.error';
-import handleCastError from './cast.error';
 import { IErrorMessage } from '../../app/modules';
-import { sendErrorResponse } from '../../libs/helper';
-import handleValidationError from './validation.error';
 import { ServerEnvironmentEnum } from '../../libs/enum';
+import { ResponseServiceInstance } from '../../libs/helper';
+import { ApiError, ErrorHandlerInstance } from './custom.error';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 
 type KnownErrors = 'ValidationError' | 'CastError' | 'TokenExpiredError' | 'JsonWebTokenError';
@@ -26,14 +23,14 @@ const handleGlobalErrors: ErrorRequestHandler = (
     // Error type mapping for consistent processing
     const errorHandlers: Record<KnownErrors, () => void> = {
         ValidationError: () => {
-            const result = handleValidationError(error);
+            const result = ErrorHandlerInstance.validation(error);
             statusCode = result.statusCode;
             message = result.message;
             errorMessages = result.errorMessages;
         },
 
         CastError: () => {
-            const result = handleCastError(error);
+            const result = ErrorHandlerInstance.cast(error);
             statusCode = result.statusCode;
             message = result.message;
             errorMessages = result.errorMessages;
@@ -58,7 +55,7 @@ const handleGlobalErrors: ErrorRequestHandler = (
     if (handler)
         handler();
     else if (error instanceof ZodError) {
-        const result = handleZodError(error);
+        const result = ErrorHandlerInstance.zod(error);
         statusCode = result.statusCode;
         message = result.message;
         errorMessages = result.errorMessages;
@@ -86,7 +83,7 @@ const handleGlobalErrors: ErrorRequestHandler = (
     }
 
     // Return standardized error response
-    return sendErrorResponse(res, {
+    return ResponseServiceInstance.error(res, {
         statusCode,
         message,
         errorMessages,
