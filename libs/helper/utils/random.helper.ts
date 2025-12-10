@@ -1,24 +1,81 @@
-// @helper: generate random password
-export const generateRandomPassword = async (length: number): Promise<string> => {
-    if (length <= 0) {
-        throw new Error("Password length must be greater than 0");
+import crypto from "crypto";
+
+export class RandomService {
+    private static instance: RandomService;
+
+    private constructor() { }
+
+    public static getInstance(): RandomService {
+        if (!RandomService.instance) {
+            RandomService.instance = new RandomService();
+        }
+        return RandomService.instance;
     }
 
-    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
-    let password = "";
+    /** ───────────────────────────────
+     *  Crypto-Secure Random Password
+     *  ─────────────────────────────── */
+    public generatePassword(
+        length: number,
+        options?: {
+            uppercase?: boolean;
+            lowercase?: boolean;
+            numbers?: boolean;
+            symbols?: boolean;
+        }
+    ): string {
+        if (length <= 0) throw new Error("Password length must be greater than 0");
 
-    for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        password += characters[randomIndex];
+        const {
+            uppercase = true,
+            lowercase = true,
+            numbers = true,
+            symbols = true,
+        } = options || {};
+
+        let chars = "";
+        if (uppercase) chars += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        if (lowercase) chars += "abcdefghijklmnopqrstuvwxyz";
+        if (numbers) chars += "0123456789";
+        if (symbols) chars += "!@#$%^&*()";
+
+        if (!chars) throw new Error("No character sets enabled!");
+
+        const bytes = crypto.randomBytes(length);
+        return Array.from(bytes)
+            .map((b) => chars[b % chars.length])
+            .join("");
     }
 
-    return password;
-};
+    /** ───────────────────────────────
+     *  Crypto-Secure OTP (digits only)
+     *  ─────────────────────────────── */
+    public generateOTP(length: number): string {
+        if (length <= 0) throw new Error("Length must be greater than 0");
 
-// @helper: generate random number
-export const generateRandomCode = async (length: number): Promise<number> => {
-    if (length <= 0) throw new Error("Length must be greater than 0");
-    const min = Math.pow(10, length - 1);
-    const max = Math.pow(10, length) - 1;
-    return Math.floor(min + Math.random() * (max - min + 1));
-};
+        const digits = "0123456789";
+        const bytes = crypto.randomBytes(length);
+
+        return Array.from(bytes)
+            .map((b) => digits[b % digits.length])
+            .join("");
+    }
+
+
+    /** ───────────────────────────────
+     *  Generic Random String
+     *  ─────────────────────────────── */
+    public generateString(length: number, characters: string): string {
+        if (!characters || characters.length === 0) {
+            throw new Error("Character set cannot be empty");
+        }
+
+        const bytes = crypto.randomBytes(length);
+        return Array.from(bytes)
+            .map((b) => characters[b % characters.length])
+            .join("");
+    }
+}
+
+// Export singleton
+export const RandomServiceInstance = RandomService.getInstance();
