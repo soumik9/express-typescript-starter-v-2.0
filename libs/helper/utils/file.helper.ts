@@ -1,158 +1,144 @@
 import path from "path";
 import { defaultImagePath } from "../../constant";
 import { FnFileReturnTypeEnum } from "../../enum";
-import { IUploadFile } from '../../../app/modules';
-import { config, errorLogger, infoLogger } from '../../../config';
-import { promises as fsPromises, existsSync, mkdirSync } from 'fs';
+import { IUploadFile } from "../../../app/modules";
+import { promises as fsPromises, existsSync, mkdirSync } from "fs";
+import { config, errorLogger, infoLogger } from "../../../config";
 
-// @helper: moveFilesToSpecificFolder function
-export const moveFilesToSpecificFolder = async (sourcePaths: string | string[], destinationFolder: string): Promise<string | string[]> => {
-    try {
-        // Normalize inputs
+export class FileService {
+    private static instance: FileService;
+
+    private constructor() { }
+
+    /** Singleton accessor */
+    public static getInstance(): FileService {
+        if (!FileService.instance) {
+            FileService.instance = new FileService();
+        }
+        return FileService.instance;
+    }
+
+    /** Move single/multiple files into target folder */
+    public async move(
+        sourcePaths: string | string[],
+        destinationFolder: string
+    ): Promise<string | string[]> {
+
         const paths = Array.isArray(sourcePaths) ? sourcePaths : [sourcePaths];
         const isMultiple = Array.isArray(sourcePaths);
 
-        // Set up destination directory
-        const publicBasePath = path.join(process.cwd(), 'public');
-        const targetDirectory = path.join(publicBasePath, destinationFolder);
-
-        // Ensure destination directory exists
-        if (!existsSync(targetDirectory)) {
-            mkdirSync(targetDirectory, { recursive: true });
-        }
-
-        // Process all files in parallel
-        const results = await Promise.all(paths.map(async (filePath) => {
-            const fileName = path.basename(filePath);
-            const destinationPath = path.join(targetDirectory, fileName);
-            const publicUrl = `public/${destinationFolder}/${fileName}`;
-
-            await fsPromises.rename(filePath, destinationPath);
-            infoLogger.info(`File moved to: ${destinationPath}, public URL: ${publicUrl}`);
-
-            return publicUrl;
-        }));
-
-        if (!results.length || !results[0])
-            return isMultiple ? [] : "";
-
-        // Return single result or array based on input type
-        return isMultiple ? results : results[0];
-    } catch (error) {
-        const errorMessage = `Error moving file(s): ${error instanceof Error ? error.message : String(error)}`;
-        errorLogger.error(errorMessage);
-        throw new Error(errorMessage);
-    }
-};
-
-/**
-    const singleUrl = await moveFiles('/tmp/uploads/image.jpg', 'images/profile');
-    // Returns: "public/images/profile/image.jpg"
-
-    const multipleUrls = await moveFiles(
-    ['/tmp/uploads/image1.jpg', '/tmp/uploads/image2.jpg'],
-    'images/gallery'
-    );
-    // Returns: ["public/images/gallery/image1.jpg", "public/images/gallery/image2.jpg"]
- */
-
-// @helper: extractFilePaths function
-export const extractFilePaths = async <T extends FnFileReturnTypeEnum.Single | FnFileReturnTypeEnum.Multiple>(
-    files: any, type: T
-): Promise<T extends 'single' ? string | undefined : string[]> => {
-    // Early return for empty files object
-    if (!files || Object.keys(files).length === 0) {
-        return (type === 'single' ? undefined : []) as any;
-    }
-
-    // Handle single file extraction
-    if (type === 'single') {
-        // Array of files case
-        if (Array.isArray(files)) {
-            return files[0]?.path as any;
-        }
-        // Object with 'single' property case
-        else if (files.single && Array.isArray(files.single)) {
-            return files.single[0]?.path as any;
-        }
-        return undefined as any;
-    }
-
-    // Handle multiple files extraction
-    else {
-        // If files.multiple exists and is an array
-        if (files.multiple && Array.isArray(files.multiple)) {
-            return files.multiple.map((file: IUploadFile) => file.path) as any;
-        }
-        return [] as any;
-    }
-};
-
-/**
-    const singlePath = await extractFilePaths(files, 'single');
-    // Returns: string | undefined
-
-    const multiplePaths = await extractFilePaths(files, 'multiple');
-    // Returns: string[]
- */
-
-// @helper: deleteFileFromLocal function
-export const deleteFileFromLocal = async (filePaths: string | string[]): Promise<void> => {
-
-    // Normalize input to array
-    const paths = Array.isArray(filePaths) ? filePaths : [filePaths];
-
-    if (paths.length === 0) return;
-
-    // Process all files in parallel
-    await Promise.all(paths.map(async (path) => {
         try {
-            await fsPromises.unlink(path);
-            infoLogger.info(`File deleted: ${path}`);
-        } catch (error) {
-            // Different logging based on error type
-            const isNotFound = (error as NodeJS.ErrnoException).code === 'ENOENT';
-            const logFn = isNotFound ? errorLogger.warn : errorLogger.error;
-            const message = isNotFound ? `File not found: ${path}` : `Failed to delete file: ${path} - ${(error as Error).message}`;
+            const publicBasePath = path.join(process.cwd(), "public");
+            const targetDirectory = path.join(publicBasePath, destinationFolder);
 
-            logFn(message);
+            if (!existsSync(targetDirectory)) {
+                mkdirSync(targetDirectory, { recursive: true });
+            }
+
+            const results = await Promise.all(
+                paths.map(async (filePath) => {
+                    const fileName = path.basename(filePath);
+                    const destinationPath = path.join(targetDirectory, fileName);
+                    const publicUrl = `public/${destinationFolder}/${fileName}`;
+
+                    await fsPromises.rename(filePath, destinationPath);
+                    infoLogger.info(
+                        `File moved to: ${destinationPath}, public URL: ${publicUrl}`
+                    );
+
+                    return publicUrl;
+                })
+            );
+
+            if (!results.length || !results[0]) {
+                return isMultiple ? [] : "";
+            }
+
+            return isMultiple ? results : results[0];
+        } catch (err) {
+            const errMsg = `Error moving file(s): ${err instanceof Error ? err.message : err}`;
+            errorLogger.error(errMsg);
+            throw new Error(errMsg);
         }
-    }));
-};
-
-/**
-     // Single file
-    await deleteFile('/path/to/file.jpg');
-
-    // Multiple files
-    await deleteFile([
-    '/path/to/file1.jpg',
-    '/path/to/file2.pdf'
-    ]);
- */
-
-// @helper: Get documents full path
-export const getDocumentsFullPath = <T extends FnFileReturnTypeEnum>(
-    paths: T extends FnFileReturnTypeEnum.Single ? string | undefined : string[] | undefined, type: T
-): T extends FnFileReturnTypeEnum.Single ? string : string[] => {
-
-    const baseUrl = config.URL.BASE;
-    const defaultUrl: string = `${config.URL.BASE}/${defaultImagePath}`;
-
-    if (type === FnFileReturnTypeEnum.Single) {
-        if (!paths) {
-            return defaultUrl as any;
-        }
-
-        // For single type, ensure paths is a string
-        const path = paths as string;
-        return `${baseUrl}/${path}` as any;
-    } else {
-        // For multiple type, ensure paths is an array
-        if (!Array.isArray(paths)) {
-            return [defaultUrl] as any;
-        }
-        const pathArray = Array.isArray(paths) ? paths : [paths as string];
-        return pathArray.map(path => `${baseUrl}/${path}`) as any;
     }
-};
+
+    /** Extract full paths from multer upload result */
+    public extractPaths<T extends FnFileReturnTypeEnum.Single | FnFileReturnTypeEnum.Multiple>(
+        files: any,
+        type: T
+    ): Promise<T extends FnFileReturnTypeEnum.Single ? string | undefined : string[]> {
+        if (!files || Object.keys(files).length === 0) {
+            return Promise.resolve(
+                type === FnFileReturnTypeEnum.Single ? undefined : []
+            ) as any;
+        }
+
+        if (type === FnFileReturnTypeEnum.Single) {
+            if (Array.isArray(files)) return Promise.resolve(files[0]?.path) as any;
+            if (files.single && Array.isArray(files.single)) {
+                return Promise.resolve(files.single[0]?.path) as any;
+            }
+            return Promise.resolve(undefined) as any;
+        }
+
+        if (files.multiple && Array.isArray(files.multiple)) {
+            return Promise.resolve(
+                files.multiple.map((file: IUploadFile) => file.path)
+            ) as any;
+        }
+
+        return Promise.resolve([]) as any;
+    }
+
+    /** Delete single or multiple files */
+    public async delete(filePaths: string | string[]): Promise<void> {
+        const paths = Array.isArray(filePaths) ? filePaths : [filePaths];
+        if (paths.length === 0) return;
+
+        await Promise.all(
+            paths.map(async (file) => {
+                try {
+                    await fsPromises.unlink(file);
+                    infoLogger.info(`File deleted: ${file}`);
+                } catch (err) {
+                    const code = (err as NodeJS.ErrnoException).code;
+                    const isNotFound = code === "ENOENT";
+                    const logger = isNotFound ? errorLogger.warn : errorLogger.error;
+                    const msg = isNotFound
+                        ? `File not found: ${file}`
+                        : `Failed to delete file: ${file} - ${(err as Error).message}`;
+
+                    logger(msg);
+                }
+            })
+        );
+    }
+
+    /** Build full URLs for documents */
+    public getFullUrl<T extends FnFileReturnTypeEnum>(
+        paths: T extends FnFileReturnTypeEnum.Single
+            ? string | undefined
+            : string[] | undefined,
+        type: T
+    ): T extends FnFileReturnTypeEnum.Single ? string : string[] {
+
+        const baseUrl = config.URL.BASE;
+        const fallback = `${baseUrl}/${defaultImagePath}`;
+
+        if (type === FnFileReturnTypeEnum.Single) {
+            if (!paths) return fallback as any;
+
+            const pathStr = paths as string;
+            return `${baseUrl}/${pathStr}` as any;
+        }
+
+        if (!Array.isArray(paths)) {
+            return [fallback] as any;
+        }
+
+        return paths.map((p) => `${baseUrl}/${p}`) as any;
+    }
+}
+
+// Export singleton
+export const FileServiceInstance = FileService.getInstance();
