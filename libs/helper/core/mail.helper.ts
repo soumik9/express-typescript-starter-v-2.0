@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import httpStatus from "http-status";
-import { zodSchemaValidate } from "../utils";
+import { ZodServiceInstance } from "../utils";
 import { ServerEnvironmentEnum } from "../../enum";
 import handlebars, { TemplateDelegate } from "handlebars";
 import { ISendEmail, SendEmailSchema } from "../../../app/modules";
@@ -72,7 +72,7 @@ export class EmailService {
             payload: ISendEmail, useCache?: boolean
         }): Promise<any> {
 
-        const validatedPayload = zodSchemaValidate(SendEmailSchema, payload);
+        const validatedPayload = ZodServiceInstance.validateSchema<ISendEmail>(SendEmailSchema, payload);
         const { toEmail, subject, template, data, fromEmail } = validatedPayload;
 
         try {

@@ -1,26 +1,64 @@
 import z from "zod";
 import httpStatus from "http-status";
-import { ApiError } from "../../../config";
+import { ApiError, errorLogger } from "../../../config";
+import { NextFunction, Request, Response } from "express";
 
-// @helper: Zod Preprocess with default value
-export const zodPreprocess = (defaultValue: any, schema: z.ZodTypeAny) => {
-    return z.preprocess(
-        (value) => value === undefined ? defaultValue : value,
-        schema
-    );
-};
+export class ZodService {
+    private static instance: ZodService;
 
-// @helper: Zod Schema Validate
-export const zodSchemaValidate = (schema: any, payload: unknown) => {
-    const result = schema.safeParse(payload);
+    private constructor() { }
 
-    if (!result.success) {
-        const message = result.error.issues
-            .map((issue: any) => issue.message)
-            .join(", ");
-
-        throw new ApiError(httpStatus.BAD_REQUEST, message);
+    /** Singleton accessor */
+    public static getInstance(): ZodService {
+        if (!ZodService.instance) {
+            ZodService.instance = new ZodService();
+        }
+        return ZodService.instance;
     }
 
-    return result.data;
-};
+    //  Preprocess value with default
+    public preprocess(defaultValue: any, schema: any) {
+        return z.preprocess((value) => value === undefined ? defaultValue : value, schema);
+    }
+
+
+    //  Validate payload against schema
+    public validateSchema<T>(schema: any, payload: unknown): T {
+        const result = schema.safeParse(payload);
+
+        if (!result.success) {
+            const message = result.error.issues
+                .map((issue: any) => issue.message)
+                .join(", ");
+            throw new ApiError(httpStatus.BAD_REQUEST, message);
+        }
+
+        return result.data as T;
+    }
+
+    /** Express middleware for validating request */
+    public validateRequest(schema: any) {
+        return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+            try {
+                if (!schema) {
+                    errorLogger.error(`Zod Schema is undefined: ${req.originalUrl}`);
+                    return next(new Error("Validation schema is undefined"));
+                }
+
+                await schema.parseAsync({
+                    body: req.body,
+                    query: req.query,
+                    params: req.params,
+                    cookies: req.cookies,
+                });
+
+                next();
+            } catch (error) {
+                next(error);
+            }
+        };
+    }
+}
+
+// Export singleton
+export const ZodServiceInstance = ZodService.getInstance();
