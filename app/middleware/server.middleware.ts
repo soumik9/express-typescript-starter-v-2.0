@@ -6,7 +6,7 @@ import { PassportKeyEnum } from '../../libs/enum';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { handleParseRequestBody } from './parser.middleware';
 import express, { Application, NextFunction, Request, Response } from 'express';
-import { config, errorLogger, handleFileCompression, httpLogger, multerUpload } from '../../config';
+import { config, errorLogger, FileCompressorInstance, httpLogger, MulterUploadInstance } from '../../config';
 
 // @middleware: request Log Middleware
 const handleRequestLog = (req: Request, res: Response, next: NextFunction) => {
@@ -38,7 +38,7 @@ export const serverMiddlewares = (app: Application) => {
     app.use(async (req: Request, res: Response, next: NextFunction) => {
         try {
             if (req.files && Object.keys(req.files).length > 0) {
-                await handleFileCompression(req.files as any);
+                await FileCompressorInstance.handle(req.files as any);
             }
             next();
         } catch (err) {
@@ -50,7 +50,7 @@ export const serverMiddlewares = (app: Application) => {
 
     // multer configure
     app.use(
-        multerUpload.fields([
+        MulterUploadInstance.getUploader().fields([
             { name: "single", maxCount: 1 },
             { name: "multiple", maxCount: 10 },
         ])

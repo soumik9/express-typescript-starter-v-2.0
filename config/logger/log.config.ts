@@ -6,8 +6,8 @@ import { ServerEnvironmentEnum } from "../../libs/enum";
 
 type LogLevel = "error" | "warn" | "info" | "http" | "verbose" | "debug" | "silly";
 
-export class LoggerFactory {
-    private static instance: LoggerFactory;
+export class LoggerService {
+    private static instance: LoggerService;
     private loggers: Map<string, winston.Logger> = new Map();
 
     private environment = process.env.NODE_ENV || "development";
@@ -28,10 +28,10 @@ export class LoggerFactory {
 
     // Singleton getter
     public static getInstance() {
-        if (!LoggerFactory.instance) {
-            LoggerFactory.instance = new LoggerFactory();
+        if (!LoggerService.instance) {
+            LoggerService.instance = new LoggerService();
         }
-        return LoggerFactory.instance;
+        return LoggerService.instance;
     }
 
     private ensureLogDir() {
@@ -169,11 +169,11 @@ export class LoggerFactory {
     }
 }
 
-const loggerFactory = LoggerFactory.getInstance();
+const LoggerInstance = LoggerService.getInstance();
 
-export const infoLogger = loggerFactory.getLogger("combined", "info");
-export const httpLogger = loggerFactory.getLogger("http", "http");
-export const errorLogger = loggerFactory.getLogger("error", "error");
+export const infoLogger = LoggerInstance.getLogger("combined", "info");
+export const httpLogger = LoggerInstance.getLogger("http", "http");
+export const errorLogger = LoggerInstance.getLogger("error", "error");
 
 // module specific loggers can be created as needed
-// const userLogger = loggerFactory.getLogger("user-module", "debug");
+// const userLogger = LoggerInstance.getLogger("user-module", "debug");
