@@ -13,5 +13,4 @@ export const PhoneCountrySchema = new Schema({
         type: String,
         required: [true, 'Country dial code is required'],
     },
-}, { _id: false }
-);
+}, { _id: false });
