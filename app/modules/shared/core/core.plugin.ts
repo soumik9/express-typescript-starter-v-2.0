@@ -1,6 +1,6 @@
 // plugins/sequentialId.plugin.ts
 import { CallbackError, Schema } from "mongoose";
-import { IIdGenerator, SequentialServiceInstance } from "../../../../libs/helper";
+import { IIdGenerator, SequentialInstance } from "../../../../libs/helper";
 
 interface PluginOptions extends IIdGenerator { }
 
@@ -13,7 +13,7 @@ export function sequentialIdPlugin(schema: Schema, options: PluginOptions) {
             if (this[fieldName]) return next();
 
             // Generate new sequential ID
-            const id = await SequentialServiceInstance.generateId(this.constructor as any, options);
+            const id = await SequentialInstance.generateId(this.constructor as any, options);
 
             this[fieldName] = id;
             next();

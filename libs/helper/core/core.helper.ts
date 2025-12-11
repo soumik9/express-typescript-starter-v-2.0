@@ -7,7 +7,7 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
  * @class ApiResponseService
  * Centralized service for handling API responses and async errors.
  */
-export class ResponseService {
+class ResponseService {
     private static instance: ResponseService;
 
     private constructor() { }
@@ -66,4 +66,4 @@ export class ResponseService {
 }
 
 /** Singleton export */
-export const ResponseServiceInstance = ResponseService.getInstance();
+export const ResponseInstance = ResponseService.getInstance();

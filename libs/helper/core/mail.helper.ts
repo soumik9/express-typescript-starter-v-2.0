@@ -1,13 +1,13 @@
 import fs from "fs";
 import path from "path";
 import httpStatus from "http-status";
-import { ZodServiceInstance } from "../utils";
+import { ZodInstance } from "../utils";
 import { ServerEnvironmentEnum } from "../../enum";
 import handlebars, { TemplateDelegate } from "handlebars";
 import { ISendEmail, SendEmailSchema } from "../../../app/modules";
 import { config, transporter, infoLogger, ApiError } from "../../../config";
 
-export class EmailService {
+class EmailService {
     private static instance: EmailService;
     private templateCache: Record<string, TemplateDelegate> = {};
     private transporterVerified = false;
@@ -72,7 +72,7 @@ export class EmailService {
             payload: ISendEmail, useCache?: boolean
         }): Promise<any> {
 
-        const validatedPayload = ZodServiceInstance.validateSchema<ISendEmail>(SendEmailSchema, payload);
+        const validatedPayload = ZodInstance.validateSchema<ISendEmail>(SendEmailSchema, payload);
         const { toEmail, subject, template, data, fromEmail } = validatedPayload;
 
         try {
@@ -115,4 +115,4 @@ export class EmailService {
 }
 
 // Export singleton
-export const EmailServiceInstance = EmailService.getInstance();
+export const EmailInstance = EmailService.getInstance();

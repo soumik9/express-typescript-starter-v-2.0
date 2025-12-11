@@ -3,7 +3,7 @@ import httpStatus from "http-status";
 import { ApiError, errorLogger } from "../../../config";
 import { NextFunction, Request, Response } from "express";
 
-export class ZodService {
+class ZodService {
     private static instance: ZodService;
 
     private constructor() { }
@@ -61,4 +61,4 @@ export class ZodService {
 }
 
 // Export singleton
-export const ZodServiceInstance = ZodService.getInstance();
+export const ZodInstance = ZodService.getInstance();

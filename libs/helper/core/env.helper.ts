@@ -7,7 +7,7 @@ import { ServerEnvironmentEnum } from "../../enum";
  * @class EnvService
  * Handles loading and validating environment variables based on NODE_ENV
  */
-export class EnvService {
+class EnvService {
     private static instance: EnvService;
 
     private constructor() { }
@@ -73,4 +73,4 @@ export class EnvService {
 }
 
 /** Singleton export */
-export const EnvServiceInstance = EnvService.getInstance();
+export const EnvInstance = EnvService.getInstance();

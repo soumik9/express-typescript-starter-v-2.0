@@ -5,11 +5,11 @@ import { Application, Request, Response } from 'express';
 import { cacheViewerEmailTeamplateStyles } from '../../../../libs/style';
 import { ApiError, config, errorLogger, infoLogger } from '../../../../config';
 import { EmailTemplateEnum, ServerEnvironmentEnum } from '../../../../libs/enum';
-import { ResponseServiceInstance, EmailServiceInstance, ServerUtilityServiceInstance, LocalCache } from '../../../../libs/helper/core';
+import { ResponseInstance, EmailInstance, ServerUtilityInstance, LocalCache } from '../../../../libs/helper/core';
 
 // @service: home route
 export const handleWelcomeRoute = (req: Request, res: Response) => {
-    const htmlContent = EmailServiceInstance.renderTemplate({
+    const htmlContent = EmailInstance.renderTemplate({
         templateName: EmailTemplateEnum.Home,
         data: {
             title: "Backend",
@@ -26,7 +26,7 @@ export const handleWelcomeRoute = (req: Request, res: Response) => {
 // @service: Health route
 export const handleHealthRoute = (app: Application) => {
     return async (req: Request, res: Response) => {
-        const healthData = await ServerUtilityServiceInstance.getHealth(app);
+        const healthData = await ServerUtilityInstance.getHealth(app);
 
         // Render HTML or JSON
         if (req.query.format === "json") {
@@ -34,7 +34,7 @@ export const handleHealthRoute = (app: Application) => {
                 .status(healthData.isReady ? httpStatus.OK : httpStatus.SERVICE_UNAVAILABLE)
                 .json(healthData);
         } else {
-            const htmlContent = EmailServiceInstance.renderTemplate({
+            const htmlContent = EmailInstance.renderTemplate({
                 templateName: EmailTemplateEnum.Health,
                 data: healthData,
             })
@@ -48,11 +48,11 @@ export const handleHealthRoute = (app: Application) => {
 
 // @service: not found
 export const handleRouteNotFound = (req: Request, res: Response) => {
-    const htmlContent = EmailServiceInstance.renderTemplate({
+    const htmlContent = EmailInstance.renderTemplate({
         templateName: EmailTemplateEnum.NotFound,
         data: {
             original_url: req.originalUrl,
-            full_url: ServerUtilityServiceInstance.url(req),
+            full_url: ServerUtilityInstance.url(req),
         }
     });
 
@@ -63,7 +63,7 @@ export const handleRouteNotFound = (req: Request, res: Response) => {
 };
 
 // @service: generate module
-export const handleGenerateModule = ResponseServiceInstance.catchAsync(
+export const handleGenerateModule = ResponseInstance.catchAsync(
     async (req: Request, res: Response) => {
         if (config.ENV !== ServerEnvironmentEnum.Development)
             throw new ApiError(httpStatus.FORBIDDEN, "You can not access this endpoint.");
@@ -71,7 +71,7 @@ export const handleGenerateModule = ResponseServiceInstance.catchAsync(
         const { folder_name, prefix, panel } = req.query as { [key: string]: string };
 
         if (!folder_name || !prefix) {
-            ResponseServiceInstance.error(res, {
+            ResponseInstance.error(res, {
                 statusCode: httpStatus.BAD_REQUEST,
                 message: "Please provide folder name and prefix",
                 errorMessages: [],
@@ -88,7 +88,7 @@ export const handleGenerateModule = ResponseServiceInstance.catchAsync(
                 baseDir = path.join(process.cwd(), "app", "modules", "app_panel");
                 break;
             default:
-                return ResponseServiceInstance.error(res, {
+                return ResponseInstance.error(res, {
                     statusCode: httpStatus.BAD_REQUEST,
                     message: "Invalid panel type. Must be 'admin' or 'app'.",
                     errorMessages: [],
@@ -124,7 +124,7 @@ export const handleGenerateModule = ResponseServiceInstance.catchAsync(
             }
         });
 
-        return ResponseServiceInstance.success(res, {
+        return ResponseInstance.success(res, {
             statusCode: httpStatus.OK,
             success: true,
             message: "Module files generated successfully",
@@ -138,7 +138,7 @@ export const handleGenerateModule = ResponseServiceInstance.catchAsync(
 );
 
 // local cache test route
-export const handleLocalCache = ResponseServiceInstance.catchAsync(
+export const handleLocalCache = ResponseInstance.catchAsync(
     async (req: Request, res: Response) => {
 
         // Restrict access in non-development environments
@@ -157,7 +157,7 @@ export const handleLocalCache = ResponseServiceInstance.catchAsync(
             value: JSON.stringify(value, null, 2)
         }));
 
-        const htmlContent = EmailServiceInstance.renderTemplate({
+        const htmlContent = EmailInstance.renderTemplate({
             templateName: EmailTemplateEnum.CacheViewer,
             data: {
                 title: "Cache Viewer",

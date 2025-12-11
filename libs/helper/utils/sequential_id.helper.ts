@@ -10,7 +10,7 @@ export interface IIdGenerator {
     useCurrentYear?: boolean;
 }
 
-export class SequentialService {
+class SequentialService {
     private static instance: SequentialService;
     private constructor() { }
 
@@ -138,4 +138,4 @@ export class SequentialService {
     }
 }
 
-export const SequentialServiceInstance = SequentialService.getInstance();
+export const SequentialInstance = SequentialService.getInstance();

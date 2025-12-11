@@ -2,7 +2,7 @@ import httpStatus from "http-status";
 import { config } from "../../config";
 import { promises as fsPromises } from "fs";
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import { ResponseServiceInstance, ServerUtilityServiceInstance } from "../../libs/helper";
+import { ResponseInstance, ServerUtilityInstance } from "../../libs/helper";
 
 export const handleCheckPublicFileExists: RequestHandler = async (
     req: Request, res: Response, next: NextFunction
@@ -12,11 +12,11 @@ export const handleCheckPublicFileExists: RequestHandler = async (
         const decodedPath = decodeURI(req.originalUrl);
 
         // Build the file path based on the process current working directory
-        const filePath = ServerUtilityServiceInstance.getLocalFilePath(decodedPath);
+        const filePath = ServerUtilityInstance.getLocalFilePath(decodedPath);
 
         // Check if the requested path is trying to access files outside the intended directory
-        if (!filePath.startsWith(ServerUtilityServiceInstance.rootPath())) {
-            ResponseServiceInstance.error(res, {
+        if (!filePath.startsWith(ServerUtilityInstance.rootPath())) {
+            ResponseInstance.error(res, {
                 statusCode: httpStatus.UNAUTHORIZED,
                 message: "Access Denied",
                 errorMessages: [{
@@ -36,7 +36,7 @@ export const handleCheckPublicFileExists: RequestHandler = async (
         // If execution reaches here, the file exists
         next();
     } catch (error) {
-        ResponseServiceInstance.error(res, {
+        ResponseInstance.error(res, {
             statusCode: httpStatus.NOT_FOUND,
             message: "File Not Found",
             errorMessages: [{

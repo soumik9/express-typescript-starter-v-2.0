@@ -9,7 +9,7 @@ interface IPaginatedProp {
     populate?: string | Record<string, any>;
 }
 
-export class PaginationService {
+class PaginationService {
     private static instance: PaginationService;
 
     private constructor() { }
@@ -91,4 +91,4 @@ export class PaginationService {
 }
 
 // Export singleton
-export const PaginationServiceInstance = PaginationService.getInstance();
+export const PaginationInstance = PaginationService.getInstance();

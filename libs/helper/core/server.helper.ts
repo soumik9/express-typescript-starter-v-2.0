@@ -3,9 +3,9 @@ import os from "os";
 import path from "path";
 import moment from "moment";
 import { Application, Request } from "express";
-import { getDatabaseInfo } from "../../../config";
+import { DatabaseInstance } from "../../../config";
 
-export class ServerUtilityService {
+class ServerUtilityService {
     private static instance: ServerUtilityService;
 
     private constructor() { }
@@ -58,7 +58,7 @@ export class ServerUtilityService {
 
         const loadAverages = os.loadavg().map((n) => n.toFixed(2)).join(" / ");
 
-        const dbInfo = await getDatabaseInfo({ username: "healthcheck" });
+        const dbInfo = await DatabaseInstance.getInfo("healthcheck");
         const isReady = app.locals.ready === true;
 
         return {
@@ -82,4 +82,4 @@ export class ServerUtilityService {
 }
 
 // Export singleton instance
-export const ServerUtilityServiceInstance = ServerUtilityService.getInstance();
+export const ServerUtilityInstance = ServerUtilityService.getInstance();

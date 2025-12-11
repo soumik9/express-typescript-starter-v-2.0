@@ -1,6 +1,6 @@
 import { MainRoutes } from './app/routes';
 import express, { Application } from 'express';
-import { bootstrap, GlobalErrorHandlerInstance } from './config';
+import { GlobalErrorInstance, ServerBootstrapInstance } from './config';
 import { handleCheckPublicFileExists, serverMiddlewares } from './app/middleware';
 import { handleGenerateModule, handleHealthRoute, handleLocalCache, handleRouteNotFound, handleWelcomeRoute } from './app/modules';
 
@@ -23,10 +23,10 @@ app.get("/local-cache", handleLocalCache);
 app.use('/api/v1', MainRoutes);
 
 // Global error handler (should be before RouteNotFound)
-app.use(GlobalErrorHandlerInstance.handler());
+app.use(GlobalErrorInstance.handler());
 
 // Handle route not found (should be the last middleware)
 app.use(handleRouteNotFound);
 
 // Server & database
-bootstrap(app);
+ServerBootstrapInstance.bootstrap(app);

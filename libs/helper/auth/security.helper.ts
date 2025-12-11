@@ -44,4 +44,4 @@ export class SecurityService {
 }
 
 // Export singleton instance
-export const SecurityServiceInstance = SecurityService.getInstance();
+export const SecuritySInstance = SecurityService.getInstance();

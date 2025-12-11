@@ -5,7 +5,7 @@ export interface IParsedQuery {
     [key: string]: string | number | null;
 }
 
-export class ParserService {
+class ParserService {
     private static instance: ParserService;
 
     private constructor() { }
@@ -44,4 +44,4 @@ export class ParserService {
 }
 
 // Export singleton instance
-export const ParserServiceInstance = ParserService.getInstance();
+export const ParserInstance = ParserService.getInstance();

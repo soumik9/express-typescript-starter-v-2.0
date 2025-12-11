@@ -5,7 +5,7 @@ import { IUploadFile } from "../../../app/modules";
 import { promises as fsPromises, existsSync, mkdirSync } from "fs";
 import { config, errorLogger, infoLogger } from "../../../config";
 
-export class FileService {
+class FileService {
     private static instance: FileService;
 
     private constructor() { }
@@ -141,4 +141,4 @@ export class FileService {
 }
 
 // Export singleton
-export const FileServiceInstance = FileService.getInstance();
+export const FileInstance = FileService.getInstance();

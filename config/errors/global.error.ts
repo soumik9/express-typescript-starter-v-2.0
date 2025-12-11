@@ -4,8 +4,8 @@ import httpStatus from 'http-status';
 import { MulterError } from 'multer';
 import { errorLogger } from '../logger';
 import { IErrorMessage } from '../../app/modules';
+import { ResponseInstance } from '../../libs/helper';
 import { ServerEnvironmentEnum } from '../../libs/enum';
-import { ResponseServiceInstance } from '../../libs/helper';
 import { ApiError, ErrorHandlerInstance } from './custom.error';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 
@@ -34,7 +34,7 @@ export class GlobalErrorService {
                 errorLogger.error(`[ERROR] : ${error instanceof Error ? error.stack || error.message : error}`);
             }
 
-            return ResponseServiceInstance.error(res, {
+            return ResponseInstance.error(res, {
                 statusCode,
                 message,
                 errorMessages,
@@ -104,4 +104,4 @@ export class GlobalErrorService {
 }
 
 /** Singleton instance for middleware usage */
-export const GlobalErrorHandlerInstance = GlobalErrorService.getInstance();
+export const GlobalErrorInstance = GlobalErrorService.getInstance();

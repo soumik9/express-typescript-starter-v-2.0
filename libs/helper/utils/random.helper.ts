@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-export class RandomService {
+class RandomService {
     private static instance: RandomService;
 
     private constructor() { }
@@ -78,4 +78,4 @@ export class RandomService {
 }
 
 // Export singleton
-export const RandomServiceInstance = RandomService.getInstance();
+export const RandomInstance = RandomService.getInstance();

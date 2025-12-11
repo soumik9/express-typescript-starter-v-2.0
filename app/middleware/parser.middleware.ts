@@ -1,6 +1,6 @@
 import httpStatus from 'http-status';
 import { errorLogger, infoLogger } from '../../config';
-import { ResponseServiceInstance } from '../../libs/helper';
+import { ResponseInstance } from '../../libs/helper';
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 
 // @middleware: parseRequestBody 
@@ -10,7 +10,7 @@ export const handleParseRequestBody: RequestHandler = (req: Request, res: Respon
 
             // Simple check to prevent excessive large payloads
             if (req.body.data.length > 5_000_000) { // 5MB limit
-                ResponseServiceInstance.error(res, {
+                ResponseInstance.error(res, {
                     statusCode: httpStatus.REQUEST_ENTITY_TOO_LARGE,
                     message: "Request data too large",
                     errorMessages: [{
@@ -36,7 +36,7 @@ export const handleParseRequestBody: RequestHandler = (req: Request, res: Respon
         const err = error as Error;
 
         if (err instanceof SyntaxError) {
-            ResponseServiceInstance.error(res, {
+            ResponseInstance.error(res, {
                 statusCode: httpStatus.BAD_REQUEST,
                 message: "Invalid JSON format",
                 errorMessages: [{
@@ -59,7 +59,7 @@ export const handleParseRequestBody: RequestHandler = (req: Request, res: Respon
         });
 
         // Generic server error response
-        ResponseServiceInstance.error(res, {
+        ResponseInstance.error(res, {
             statusCode: httpStatus.INTERNAL_SERVER_ERROR,
             message: "Server error processing request",
             errorMessages: [{
