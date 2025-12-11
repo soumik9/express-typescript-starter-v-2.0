@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
-import { z, ZodTypeAny } from "zod";
 import { ServerEnvironmentEnum } from "../../enum";
 
 /**
@@ -60,11 +59,11 @@ export class EnvService {
      * @param schema Zod schema to validate process.env
      * @returns validated environment object
      * ─────────────────────────────── */
-    public validate(schema: ZodTypeAny): any {
+    public validate(schema: any): any {
         const parsed = schema.safeParse(process.env);
         if (!parsed.success) {
             const errorMessage = parsed.error.issues
-                .map((issue) => `${issue.path.join(".")} - ${issue.message}`)
+                .map((issue: any) => `${issue.path.join(".")} - ${issue.message}`)
                 .join(", ");
             throw new Error(`Invalid environment variables: ${errorMessage}`);
         }
