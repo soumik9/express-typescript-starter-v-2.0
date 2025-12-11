@@ -1,9 +1,12 @@
 import path from "path";
+import httpStatus from "http-status";
 import { defaultImagePath } from "../../constant";
 import { FnFileReturnTypeEnum } from "../../enum";
 import { IUploadFile } from "../../../app/modules";
+import { NextFunction, Request, Response } from "express";
 import { promises as fsPromises, existsSync, mkdirSync } from "fs";
 import { config, errorLogger, infoLogger } from "../../../config";
+import { ResponseInstance, ServerUtilityInstance } from "../core";
 
 class FileService {
     private static instance: FileService;
@@ -63,7 +66,7 @@ class FileService {
     }
 
     /** Extract full paths from multer upload result */
-    public extractPaths<T extends FnFileReturnTypeEnum.Single | FnFileReturnTypeEnum.Multiple>(
+    public paths<T extends FnFileReturnTypeEnum.Single | FnFileReturnTypeEnum.Multiple>(
         files: any,
         type: T
     ): Promise<T extends FnFileReturnTypeEnum.Single ? string | undefined : string[]> {
@@ -115,7 +118,7 @@ class FileService {
     }
 
     /** Build full URLs for documents */
-    public getFullUrl<T extends FnFileReturnTypeEnum>(
+    public url<T extends FnFileReturnTypeEnum>(
         paths: T extends FnFileReturnTypeEnum.Single
             ? string | undefined
             : string[] | undefined,
@@ -138,6 +141,45 @@ class FileService {
 
         return paths.map((p) => `${baseUrl}/${p}`) as any;
     }
+
+    // NEW: PUBLIC FILE EXISTENCE CHECK MIDDLEWARE
+    public exists = async (
+        req: Request, res: Response, next: NextFunction
+    ) => {
+        try {
+            const decodedPath = decodeURI(req.originalUrl);
+            const filePath = ServerUtilityInstance.getLocalFilePath(decodedPath);
+
+            // Prevent path traversal outside /public/
+            if (!filePath.startsWith(ServerUtilityInstance.rootPath())) {
+                ResponseInstance.error(res, {
+                    statusCode: httpStatus.UNAUTHORIZED,
+                    message: "Access Denied",
+                    errorMessages: [{
+                        path: "",
+                        message: "Invalid file path requested",
+                    }],
+                    error: null,
+                    path: req.originalUrl || "",
+                });
+                return;
+            }
+
+            await fsPromises.access(filePath, fsPromises.constants.F_OK);
+            next();
+        } catch {
+            ResponseInstance.error(res, {
+                statusCode: httpStatus.NOT_FOUND,
+                message: "File Not Found",
+                error: null,
+                errorMessages: [{
+                    path: config.ENV === "production" ? "" : req.originalUrl,
+                    message: "Image not found or has been deleted.",
+                }],
+                path: req.originalUrl || "",
+            });
+        }
+    };
 }
 
 // Export singleton
