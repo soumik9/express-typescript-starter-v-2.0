@@ -1,68 +1,97 @@
-import cors from 'cors'
-import moment from 'moment';
+import cors from "cors";
+import moment from "moment";
 import helmet from "helmet";
-import passport from 'passport';
-import { PassportKeyEnum } from '../../libs/enum';
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { handleParseRequestBody } from './parser.middleware';
-import express, { Application, NextFunction, Request, Response } from 'express';
-import { config, errorLogger, FileCompressorInstance, httpLogger, MulterUploadInstance } from '../../config';
+import passport from "passport";
+import { PassportKeyEnum } from "../../libs/enum";
+import { ParserInstance } from "../../libs/helper";
+import express, { Application, NextFunction, Request, Response } from "express";
+import { ExtractJwt, Strategy } from "passport-jwt";
+import { config, httpLogger, errorLogger, MulterUploadInstance, FileCompressorInstance, } from "../../config";
 
-// @middleware: request Log Middleware
-const handleRequestLog = (req: Request, res: Response, next: NextFunction) => {
-    const { method } = req;
-    const startTime = moment();
+class ServerMiddlewareService {
+    private static instance: ServerMiddlewareService;
 
-    res.on('finish', () => {
-        const endTime = moment();
-        const duration = endTime.diff(startTime);
-        const formattedDuration = moment.duration(duration).asMilliseconds();
-        const message = `${method} ${config.URL.BASE + req.originalUrl} ${res.statusCode} - ${formattedDuration}ms`;
-        httpLogger.http(message);
-    });
+    private constructor() { }
 
-    next();
-};
-
-export const serverMiddlewares = (app: Application) => {
-
-    app.use(express.json());
-    app.use(cors());
-    app.use(express.urlencoded({ extended: true }));
-
-    app.use(helmet({
-        crossOriginResourcePolicy: { policy: 'cross-origin' },
-    }));
-
-    // Add global compression middleware after multer
-    app.use(async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            if (req.files && Object.keys(req.files).length > 0) {
-                await FileCompressorInstance.handle(req.files as any);
-            }
-            next();
-        } catch (err) {
-            errorLogger.error(`Global file compression error: ${err instanceof Error ? err.message : String(err)}`);
-            next(err);
+    /** Singleton accessor */
+    public static getInstance(): ServerMiddlewareService {
+        if (!ServerMiddlewareService.instance) {
+            ServerMiddlewareService.instance = new ServerMiddlewareService();
         }
-    });
+        return ServerMiddlewareService.instance;
+    }
 
+    // Core public method to register all global middlewares
+    public register(app: Application) {
+        app.use(express.json());
+        app.use(cors());
+        app.use(express.urlencoded({ extended: true }));
 
-    // multer configure
-    app.use(
-        MulterUploadInstance.getUploader().fields([
-            { name: "single", maxCount: 1 },
-            { name: "multiple", maxCount: 10 },
-        ])
-    );
+        app.use(
+            helmet({
+                crossOriginResourcePolicy: { policy: "cross-origin" },
+            })
+        );
 
-    app.use(handleRequestLog);
-    app.use(handleParseRequestBody);
+        app.use(async (req: Request, res: Response, next: NextFunction) => {
+            try {
+                if (req.files && Object.keys(req.files).length > 0) {
+                    await FileCompressorInstance.handle(req.files as any);
+                }
+                next();
+            } catch (err) {
+                errorLogger.error(
+                    `Global file compression error: ${err instanceof Error ? err.message : String(err)
+                    }`
+                );
+                next(err);
+            }
+        });
 
-    // passport.use(PassportKeyEnum.JwtAuth, new Strategy({
-    //     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    //     secretOrKey: config.TOKEN.SECRET,
-    // }, passportJwtVerify));
+        app.use(
+            MulterUploadInstance.getUploader().fields([
+                { name: "single", maxCount: 1 },
+                { name: "multiple", maxCount: 10 },
+            ])
+        );
 
-    app.use(passport.initialize());
-};
+        app.use(this.handleRequestLog);
+        app.use(ParserInstance.body);
+
+        // If strategy should be enabled later, uncomment this block:
+        /*
+        passport.use(
+            PassportKeyEnum.JwtAuth,
+            new Strategy(
+                {
+                    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+                    secretOrKey: config.TOKEN.SECRET,
+                },
+                passportJwtVerify
+            )
+        );
+        */
+
+        app.use(passport.initialize());
+    }
+
+    // Logging Middleware
+    private handleRequestLog = (req: Request, res: Response, next: NextFunction) => {
+        const { method } = req;
+        const startTime = moment();
+
+        res.on("finish", () => {
+            const endTime = moment();
+            const duration = moment.duration(endTime.diff(startTime)).asMilliseconds();
+
+            const message = `${method} ${config.URL.BASE + req.originalUrl} ${res.statusCode} - ${duration}ms`;
+
+            httpLogger.http(message);
+        });
+
+        next();
+    };
+}
+
+// Export singleton
+export const ServerMiddlewareInstance = ServerMiddlewareService.getInstance();

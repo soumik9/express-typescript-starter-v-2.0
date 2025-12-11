@@ -2,13 +2,13 @@ import { MainRoutes } from './app/routes';
 import express, { Application } from 'express';
 import { CoreServiceInstance } from './app/modules';
 import { FileInstance } from './libs/helper'; // dont up the file
-import { serverMiddlewares } from './app/middleware';
+import { ServerMiddlewareInstance } from './app/middleware';
 import { GlobalErrorInstance, ServerBootstrapInstance } from './config';
 
 const app: Application = express();
 
 // Middleware
-serverMiddlewares(app);
+ServerMiddlewareInstance.register(app);
 
 // files route
 app.use('/public', FileInstance.exists, express.static('public'));
