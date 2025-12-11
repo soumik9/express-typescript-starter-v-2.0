@@ -5,7 +5,7 @@ import { ZodInstance } from "../utils";
 import { ServerEnvironmentEnum } from "../../enum";
 import handlebars, { TemplateDelegate } from "handlebars";
 import { ISendEmail, SendEmailSchema } from "../../../app/modules";
-import { config, transporter, infoLogger, ApiError } from "../../../config";
+import { config, infoLogger, ApiError, TransporterInstance } from "../../../config";
 
 class EmailService {
     private static instance: EmailService;
@@ -60,7 +60,7 @@ class EmailService {
     /** Ensure transporter is verified once */
     private async verifyTransporter() {
         if (!this.transporterVerified) {
-            await transporter.verify();
+            await TransporterInstance.verify();
             this.transporterVerified = true;
             infoLogger.info("Mail server is ready to send messages");
         }
@@ -87,7 +87,7 @@ class EmailService {
                 throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Template not found");
             }
 
-            const response = await transporter.sendMail({
+            const response = await TransporterInstance.sendMail({
                 from: fromEmail ?? config.MAIL.FROM,
                 to: toEmail,
                 subject,
