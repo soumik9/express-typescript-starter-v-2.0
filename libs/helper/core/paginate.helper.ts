@@ -7,6 +7,7 @@ interface IPaginatedProp {
     limit?: number | string;
     sort?: Record<string, any>;
     populate?: string | Record<string, any>;
+    dtoClass?: any;
 }
 
 class PaginationService {
@@ -31,7 +32,8 @@ class PaginationService {
         page = 1,
         limit = 10,
         sort = { created_at: -1 },
-        populate = ''
+        populate = '',
+        dtoClass,
     }: IPaginatedProp): Promise<{ data: T; meta: IApiResponseMeta }> {
         const currentPage = parseInt(page as any) || 1;
         const pageSize = parseInt(limit as any) || 10;
@@ -46,8 +48,12 @@ class PaginationService {
             .lean();
 
         if (populate) dataQuery = dataQuery.populate(populate);
+        const rawData = await dataQuery;
 
-        const data = await dataQuery;
+        // map to DTO if provided
+        const data = dtoClass
+            ? rawData.map((item: T) => new dtoClass(item))
+            : rawData;
 
         return {
             data,
