@@ -1,17 +1,27 @@
-import express, { Router } from 'express';
+// app/routes/index.ts
+import { Router } from 'express';
 
-const router = express.Router();
+class MainRouter {
+    private readonly router: Router;
 
-const apiRoutes: { path: string, route: Router }[] = [
-    // {
-    //     path: '/auth',
-    //     route: AuthRoutes,
-    // },
-    // {
-    //     path: '/user',
-    //     route: UserRoutes,
-    // },
-];
+    constructor() {
+        this.router = Router();
+        this.registerRoutes();
+    }
 
-apiRoutes.forEach(route => router.use(route.path, route.route));
-export default router;
+    private registerRoutes(): void {
+        const apiRoutes: any[] = [
+            //   { path: "/auth", route: AdminAuthModuleInstance.router },
+        ];
+
+        apiRoutes.forEach((route) => {
+            this.router.use(route.path, route.route);
+        });
+    }
+
+    public getRouter(): Router {
+        return this.router;
+    }
+}
+
+export const MainRoutesInstance = new MainRouter();
