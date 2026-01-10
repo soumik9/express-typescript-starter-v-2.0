@@ -76,4 +76,13 @@
 //     next();
 // });
 
+// auto generate sequential uid
+// AdminSchema.plugin(sequentialIdPlugin, {
+//     prefix: PrefixItemEnum.Admin,
+//     fieldName: "admin_id",
+//     includeYear: true,
+//     digitLength: 4,
+//     useCurrentYear: true
+// });
+
 // export const Admin = model<IAdmin>("Admin", AdminSchema);

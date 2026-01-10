@@ -1,44 +1,65 @@
-// import express from 'express'
-// const router = express.Router();
+// // customer.route.ts
+// import { Router } from 'express';
+// import { AdminController } from './admin.controller';
+// import { AdminZodSchemaInstance } from './admin.zod';
+// import { AdminRoleEnum } from '../../../../libs/enum';
+// import { ZodInstance } from '../../../../libs/helper';
+// import { AuthMiddlewareInstance } from '../../../middleware';
 
-// import { AdminRoleEnum } from '../../../../libs/enums';
-// import { adminAuthMiddleware, zodRequestValidator } from '../../../middleware';
-// import { AdminCreateZodSchema, AdminUpdateZodSchema, SingleAdminQueryZodSchema } from './admin.zod';
-// import { CreateSingleAdmin, DeleteSingleAdmin, GetFilteredPaginateAdmins, GetSingleAdmin, UpdateSingleAdmin, UpdateAdminOwnProfile } from './admin.controller';
+// export class AdminRoutes {
+//     public readonly router: Router;
 
-// //routes
-// router.get(
-//     '/',
-//     adminAuthMiddleware(AdminRoleEnum.Admin),
-//     GetFilteredPaginateAdmins
-// );
+//     constructor(
+//         private readonly adminController: AdminController
+//     ) {
+//         this.router = Router();
+//         this.registerRoutes();
+//     }
 
-// router.get(
-//     '/single',
-//     adminAuthMiddleware(AdminRoleEnum.Admin),
-//     zodRequestValidator(SingleAdminQueryZodSchema),
-//     GetSingleAdmin
-// );
+//     private registerRoutes(): void {
+//         this.router.get(
+//             '/',
+//             AuthMiddlewareInstance.admin(AdminRoleEnum.SuperAdmin, AdminRoleEnum.Admin),
+//             this.adminController.getFilteredPaginated
+//         );
 
-// router.post(
-//     '/create',
-//     adminAuthMiddleware(AdminRoleEnum.Admin),
-//     zodRequestValidator(AdminCreateZodSchema),
-//     CreateSingleAdmin
-// );
+//         this.router.get(
+//             '/single',
+//             AuthMiddlewareInstance.admin(AdminRoleEnum.SuperAdmin, AdminRoleEnum.Admin),
+//             ZodInstance.validateRequest(AdminZodSchemaInstance.getById),
+//             this.adminController.getSingle
+//         );
 
-// router.patch(
-//     '/update',
-//     adminAuthMiddleware(AdminRoleEnum.Admin),
-//     zodRequestValidator(AdminUpdateZodSchema),
-//     UpdateSingleAdmin
-// );
+//         this.router.post(
+//             '/create',
+//             AuthMiddlewareInstance.admin(AdminRoleEnum.SuperAdmin, AdminRoleEnum.Admin),
+//             ZodInstance.validateRequest(AdminZodSchemaInstance.create),
+//             this.adminController.createSingle
+//         );
 
-// router.delete(
-//     '/delete',
-//     adminAuthMiddleware(AdminRoleEnum.Admin),
-//     zodRequestValidator(SingleAdminQueryZodSchema),
-//     DeleteSingleAdmin
-// );
+//         this.router.patch(
+//             '/update',
+//             AuthMiddlewareInstance.admin(AdminRoleEnum.SuperAdmin, AdminRoleEnum.Admin),
+//             ZodInstance.validateRequest(AdminZodSchemaInstance.update),
+//             this.adminController.updateSingle
+//         );
 
-// export const AdminRoutes = router;
+//         this.router.patch(
+//             '/update-own-profile',
+//             AuthMiddlewareInstance.admin(AdminRoleEnum.SuperAdmin, AdminRoleEnum.Admin, AdminRoleEnum.Manager, AdminRoleEnum.CustomerManager, AdminRoleEnum.SalesManager),
+//             this.adminController.updateSingleOwnProfile
+//         );
+
+
+//         this.router.delete(
+//             '/delete',
+//             AuthMiddlewareInstance.admin(AdminRoleEnum.SuperAdmin, AdminRoleEnum.Admin),
+//             ZodInstance.validateRequest(AdminZodSchemaInstance.getById),
+//             this.adminController.deleteSingle
+//         );
+//     }
+
+//     public getRouter(): Router {
+//         return this.router;
+//     }
+// }
