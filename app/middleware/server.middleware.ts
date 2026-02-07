@@ -83,12 +83,9 @@ class ServerMiddlewareService {
         res.on("finish", () => {
             const endTime = moment();
             const duration = moment.duration(endTime.diff(startTime)).asMilliseconds();
-
             const message = `${method} ${config.URL.BASE + req.originalUrl} ${res.statusCode} - ${duration}ms`;
-
             httpLogger.http(message);
         });
-
         next();
     };
 }

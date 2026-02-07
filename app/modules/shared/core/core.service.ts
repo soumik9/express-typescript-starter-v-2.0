@@ -28,7 +28,7 @@ class CoreService {
             templateName: EmailTemplateEnum.Home,
             data: {
                 title: "Backend",
-                explore_url: "https://soumikahammed.com/",
+                explore_url: "#",
             },
         });
 

@@ -4,10 +4,16 @@ import { IUser } from '../../user';
 
 declare global {
     namespace Express {
+        interface Admin {
+            _id: string;
+            name: string;
+            email: string;
+            role: string;
+        }
+
         interface Request {
             files?: Express.Multer.File[] | Express.Multer.File;
-            admin?: any;
-            customer?: any;
+            admin?: Admin;
         }
     }
 }

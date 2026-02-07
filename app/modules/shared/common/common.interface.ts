@@ -18,3 +18,9 @@ export interface IPhoneCountry {
     name: string;      // e.g., "United States", "United Kingdom"
     dial_code: string;  // e.g., "+1", "+44", "+91"
 }
+
+export interface ICommonDoc {
+    path: string;
+    original_name: string;
+    unique_name: string;
+}

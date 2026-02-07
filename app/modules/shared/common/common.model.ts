@@ -14,3 +14,18 @@ export const PhoneCountrySchema = new Schema({
         required: [true, 'Country dial code is required'],
     },
 }, { _id: false });
+
+export const DocumentSchema = new Schema({
+    path: {
+        type: String,
+        required: [true, 'Document path is required'],
+    },
+    original_name: {
+        type: String,
+        required: [true, 'Document original name is required'],
+    },
+    unique_name: {
+        type: String,
+        required: [true, 'Document unique name is required'],
+    },
+}, { _id: false });

@@ -11,3 +11,16 @@ export interface IBaseFindParams<T> {
     dbName?: string;
     populate?: PopulateOptions | PopulateOptions[];
 }
+
+export type ITenantBaseFindParams<T> = Pick<IBaseFindParams<T>,
+    'query' |
+    'isItemShouldExist' |
+    'isConflicted' |
+    'filterWithDto' |
+    'conflictMessage' |
+    'notFoundMessage' |
+    'mapper' |
+    'populate'
+> & {
+    dbName: string;
+};

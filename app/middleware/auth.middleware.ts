@@ -47,7 +47,7 @@ class AuthMiddleware {
 
                     // Normalize into req.admin for backward compatibility
                     req.admin = {
-                        _id: user._id,
+                        _id: String(user._id),
                         email: user.email,
                         role: user.role,
                         name: user.name,
