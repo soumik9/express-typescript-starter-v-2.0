@@ -1,2 +1,1 @@
-export * from './shared/common';
-export * from './shared/core';
+export * from "./admin"

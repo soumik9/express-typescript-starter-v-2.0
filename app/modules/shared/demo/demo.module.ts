@@ -1,32 +1,33 @@
-// // admin.module.ts
+// // merchant.module.ts
 // import { Router } from 'express';
-// import { Admin } from './admin.model';
-// import { AdminRoutes } from './admin.route';
-// import { SharedRegistry } from '../../shared';
-// import { AdminService } from './admin.service';
-// import { AdminController } from './admin.controller';
+// import { BaseModule } from '../../shared';
+// import { Merchant } from './merchant.model';
+// import { MerchantRoutes } from './merchant.route';
+// import { MerchantService } from './merchant.service';
+// import { MerchantController } from './merchant.controller';
 
-// class AdminModule {
+// class MerchantModule extends BaseModule<MerchantController> {
 
-//     public readonly router: Router;
+//     // Lazy load local service
+//     private _service?: MerchantService;
+//     public get service(): MerchantService {
+//         if (!this._service) {
+//             this._service = new MerchantService(Merchant);
+//         }
+//         return this._service;
+//     }
 
-//     public readonly adminService: AdminService;
-//     public readonly adminController: AdminController;
-
-//     constructor() {
-//         // Create services
-//         this.adminService = new AdminService(Admin);
-
-//         // Create controllers and inject services
-//         this.adminController = new AdminController(
-//             this.adminService,
-//             SharedRegistry.emailTemplateService
+//     // Create Controller
+//     protected createController(): MerchantController {
+//         return new MerchantController(
+//             this.service
 //         );
+//     }
 
-//         // Create routes and inject controllers
-//         this.router = new AdminRoutes(this.adminController).getRouter();
+//     // Create Router
+//     protected createRouter(): Router {
+//         return new MerchantRoutes(this.controller).getRouter();
 //     }
 // }
 
-// // business.module.ts
-// export const AdminModuleInstance = new AdminModule();
+// export const MerchantModuleInstance = new MerchantModule();

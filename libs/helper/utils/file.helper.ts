@@ -2,11 +2,11 @@ import path from "path";
 import httpStatus from "http-status";
 import { defaultImagePath } from "../../constant";
 import { FnFileReturnTypeEnum } from "../../enum";
-import { IUploadFile } from "../../../app/modules";
 import { NextFunction, Request, Response } from "express";
-import { promises as fsPromises, existsSync, mkdirSync } from "fs";
 import { config, errorLogger, infoLogger } from "../../../config";
 import { ResponseInstance, ServerUtilityInstance } from "../core";
+import { promises as fsPromises, existsSync, mkdirSync } from "fs";
+import { ICommonDoc, IUploadFile } from "../../../app/modules/shared";
 
 class FileService {
     private static instance: FileService;
@@ -21,15 +21,11 @@ class FileService {
         return FileService.instance;
     }
 
-    /** Move single/multiple files into target folder */
+    // Move single or multiple files into target folder 
     public async move(
-        sourcePaths: string | string[],
+        file: ICommonDoc | ICommonDoc[],
         destinationFolder: string
-    ): Promise<string | string[]> {
-
-        const paths = Array.isArray(sourcePaths) ? sourcePaths : [sourcePaths];
-        const isMultiple = Array.isArray(sourcePaths);
-
+    ): Promise<ICommonDoc | ICommonDoc[]> {
         try {
             const publicBasePath = path.join(process.cwd(), "public");
             const targetDirectory = path.join(publicBasePath, destinationFolder);
@@ -38,26 +34,28 @@ class FileService {
                 mkdirSync(targetDirectory, { recursive: true });
             }
 
-            const results = await Promise.all(
-                paths.map(async (filePath) => {
-                    const fileName = path.basename(filePath);
-                    const destinationPath = path.join(targetDirectory, fileName);
-                    const publicUrl = `public/${destinationFolder}/${fileName}`;
+            const moveSingle = async (doc: ICommonDoc): Promise<ICommonDoc> => {
+                const fileName = path.basename(doc.path);
+                const destinationPath = path.join(targetDirectory, fileName);
 
-                    await fsPromises.rename(filePath, destinationPath);
-                    infoLogger.info(
-                        `File moved to: ${destinationPath}, public URL: ${publicUrl}`
-                    );
+                await fsPromises.rename(doc.path, destinationPath);
 
-                    return publicUrl;
-                })
-            );
+                const updatedDoc: ICommonDoc = {
+                    ...doc,
+                    path: `public/${destinationFolder}/${fileName}`,
+                };
 
-            if (!results.length || !results[0]) {
-                return isMultiple ? [] : "";
+                infoLogger.info(`File moved to: ${updatedDoc.path}`);
+                return updatedDoc;
+            };
+
+            // ---- Array case
+            if (Array.isArray(file)) {
+                return await Promise.all(file.map(moveSingle));
             }
 
-            return isMultiple ? results : results[0];
+            // ---- Single file case
+            return await moveSingle(file);
         } catch (err) {
             const errMsg = `Error moving file(s): ${err instanceof Error ? err.message : err}`;
             errorLogger.error(errMsg);
@@ -65,32 +63,41 @@ class FileService {
         }
     }
 
+
     /** Extract full paths from multer upload result */
     public paths<T extends FnFileReturnTypeEnum.Single | FnFileReturnTypeEnum.Multiple>(
         files: any,
-        type: T
-    ): Promise<T extends FnFileReturnTypeEnum.Single ? string | undefined : string[]> {
+        type: T,
+        field?: string
+    ): Promise<T extends FnFileReturnTypeEnum.Single ? ICommonDoc | null : ICommonDoc[]> {
         if (!files || Object.keys(files).length === 0) {
             return Promise.resolve(
                 type === FnFileReturnTypeEnum.Single ? undefined : []
             ) as any;
         }
 
+        const mapFile = (file: IUploadFile): ICommonDoc => ({
+            path: file.path || "",
+            original_name: file.originalname,
+            unique_name: file.filename || "", // adjust based on multer config
+        });
+
         if (type === FnFileReturnTypeEnum.Single) {
-            if (Array.isArray(files)) return Promise.resolve(files[0]?.path) as any;
-            if (files.single && Array.isArray(files.single)) {
-                return Promise.resolve(files.single[0]?.path) as any;
-            }
-            return Promise.resolve(undefined) as any;
+            let file: IUploadFile | undefined;
+
+            if (Array.isArray(files)) file = files[0];
+            else if (files[field!] && Array.isArray(files[field!])) file = files[field!][0];
+            else if (files[field!]) file = files[field!];
+
+            return (file ? mapFile(file) : null) as any;
         }
 
-        if (files.multiple && Array.isArray(files.multiple)) {
-            return Promise.resolve(
-                files.multiple.map((file: IUploadFile) => file.path)
-            ) as any;
+        // Multiple files
+        if (files[field!] && Array.isArray(files[field!])) {
+            return files[field!].map(mapFile) as any;
         }
 
-        return Promise.resolve([]) as any;
+        return [] as any;
     }
 
     /** Delete single or multiple files */
@@ -122,11 +129,15 @@ class FileService {
         paths: T extends FnFileReturnTypeEnum.Single
             ? string | undefined
             : string[] | undefined,
-        type: T
+        type: T,
+        isUseLiveUrl: boolean = false,
     ): T extends FnFileReturnTypeEnum.Single ? string : string[] {
 
-        const baseUrl = config.URL.BASE;
-        const fallback = `${baseUrl}/${defaultImagePath}`;
+        const baseUrl = isUseLiveUrl ? config.URL.BASE_LIVE : config.URL.BASE;
+        let fallback = `${config.URL.BASE}/${defaultImagePath}`;
+
+        // const baseUrl = isUseLiveUrl ? process.env.BASE_LIVE_URL : process.env.BASE_URL;
+        // let fallback = `${process.env.BASE_URL}/${defaultImagePath}`;
 
         if (type === FnFileReturnTypeEnum.Single) {
             if (!paths) return fallback as any;
@@ -180,6 +191,40 @@ class FileService {
             });
         }
     };
+
+    /**
+     * Handles file upload, move, and cleanup on failure
+     * @param files - req.files
+     * @param destFolder - folder path to move the file
+     */
+    public async handleSingleUpload(files: any, destFolder: string, field?: string) {
+        let uploadedFile: ICommonDoc | null = null;
+        let movedFile: ICommonDoc | null = null;
+
+        try {
+            if (!files)
+                return { movedFile: null, cleanup: async () => { } };
+
+            uploadedFile = await this.paths(files, FnFileReturnTypeEnum.Single, field);
+
+            if (uploadedFile) {
+                movedFile = await this.move(uploadedFile, destFolder) as ICommonDoc;
+            }
+
+            // Cleanup function to delete files on error
+            const cleanup = async () => {
+                if (movedFile?.path) await this.delete(movedFile.path);
+                if (uploadedFile?.path) await this.delete(uploadedFile.path);
+            };
+
+            return { movedFile, cleanup };
+        } catch (err) {
+            // Ensure cleanup if something fails
+            if (uploadedFile?.path) await this.delete(uploadedFile.path);
+            if (movedFile?.path) await this.delete(movedFile.path);
+            throw err;
+        }
+    }
 }
 
 // Export singleton

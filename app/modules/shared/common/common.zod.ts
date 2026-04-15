@@ -1,4 +1,5 @@
 import z from "zod";
+import { ZodInstance } from "../../../../libs/helper/utils";
 
 // Zod Schema
 export const SendEmailSchema = z.object({
@@ -8,4 +9,23 @@ export const SendEmailSchema = z.object({
     data: z.record(z.string(), z.any()).optional(),
     fromEmail: z.email({ message: "Invalid email address" }).nonempty({ message: "From Email is required" }).optional(),
     isUseCache: z.boolean().optional(),
+});
+
+// Phone Country Zod Schema
+export const PhoneCountryZodSchema = z.object({
+    code: ZodInstance.preprocess(
+        "", z
+            .string()
+            .nonempty({ message: "Country code is required" })
+    ),
+    name: ZodInstance.preprocess(
+        "", z
+            .string()
+            .nonempty({ message: "Country name is required" })
+    ),
+    dial_code: ZodInstance.preprocess(
+        "", z
+            .string()
+            .nonempty({ message: "Country dial code is required" })
+    ),
 });

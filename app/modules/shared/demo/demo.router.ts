@@ -10,7 +10,7 @@
 //     public readonly router: Router;
 
 //     constructor(
-//         private readonly adminController: AdminController
+//         private readonly controller: AdminController
 //     ) {
 //         this.router = Router();
 //         this.registerRoutes();

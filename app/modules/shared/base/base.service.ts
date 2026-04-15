@@ -3,8 +3,8 @@ import httpStatus from "http-status";
 import { IApiResponseMeta } from "..";
 import { ApiError } from "../../../../config";
 import { IBaseFindParams } from "./base.interface";
-import { PaginationInstance } from "../../../../libs/helper";
-import { Model, FilterQuery, ClientSession, PopulateOptions } from "mongoose";
+import { PaginationInstance } from "../../../../libs/helper/core";
+import { Model, FilterQuery, PopulateOptions, ClientSession, CreateOptions, Document } from "mongoose";
 
 export abstract class BaseService<T> {
     constructor(
@@ -46,10 +46,10 @@ export abstract class BaseService<T> {
     }
 
     // create one data 
-    public async createOne<R = T>({ data, filterWithDto = false, session, populate }: {
-        data: Record<string, any>;
-        filterWithDto?: boolean;
-        populate?: PopulateOptions | PopulateOptions[];
+    public async createOne<R = T>({ data, filterWithDto = false, populate, session }: {
+        data: Record<string, any>,
+        filterWithDto?: boolean,
+        populate?: PopulateOptions | PopulateOptions[],
         session?: ClientSession;
     }): Promise<R> {
         const docs = await this.model.create(
@@ -68,6 +68,34 @@ export abstract class BaseService<T> {
 
         const plainObject = savedDoc?.toObject();
         return filterWithDto ? new this.defaultMapper(plainObject as T) : (plainObject as R);
+    }
+
+    // ... inside your class ...
+    public async createMany<R = T[]>({ data, filterWithDto = false, populate, session }: {
+        data: Record<string, any>[],
+        filterWithDto?: boolean,
+        populate?: PopulateOptions | PopulateOptions[],
+        session?: ClientSession;
+    }): Promise<R> {
+        if (!Array.isArray(data) || data.length === 0) {
+            throw new ApiError(httpStatus.BAD_REQUEST, "Data array cannot be empty for bulk creation");
+        }
+
+        const options: CreateOptions = session ? { session } : {};
+        const docs = await this.model.create(data, options) as unknown as Document<unknown, {}, T>[];
+        if (!docs || docs.length === 0) {
+            throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, `Failed to create ${this.entityName}s!`);
+        }
+        if (populate) {
+            await this.model.populate(docs, populate);
+        }
+
+        // Map to DTOs or Plain Objects
+        const results = docs.map((doc) => {
+            const plainObject = doc.toObject();
+            return filterWithDto ? new this.defaultMapper(plainObject as T) : plainObject;
+        });
+        return results as unknown as R;
     }
 
     // get all
@@ -118,7 +146,6 @@ export abstract class BaseService<T> {
         session?: ClientSession;
         options?: Record<string, any>;
     }): Promise<R> {
-
         const updateQuery: Record<string, any> = { ...updatedData };
         if (Object.keys(data).length > 0) {
             updateQuery.$set = data;
@@ -126,10 +153,10 @@ export abstract class BaseService<T> {
 
         const result = await this.model.findOneAndUpdate(
             query,
-            updateQuery,
+            { $set: data },
             {
                 ...options,
-                ...(session && { session })
+                ...(session ? { session } : {})
             }
         );
 
@@ -150,7 +177,7 @@ export abstract class BaseService<T> {
             }
         }
 
-        return filterWithDto ? new this.defaultMapper(result as T) : (result as R);
+        return filterWithDto ? new this.defaultMapper(result.toObject() as T) : (result.toObject() as R);
     }
 
     // delete one method
@@ -158,6 +185,14 @@ export abstract class BaseService<T> {
         const result = await this.model.deleteOne(query);
         if (result.deletedCount === 0) {
             throw new ApiError(httpStatus.NOT_FOUND, `${this.entityName} not found for deletion!`);
+        }
+        return true;
+    }
+
+    public async deleteMany(query: FilterQuery<T>): Promise<boolean> {
+        const result = await this.model.deleteMany(query);
+        if (result.deletedCount === 0) {
+            throw new ApiError(httpStatus.NOT_FOUND, `No ${this.entityName}s found for deletion!`);
         }
         return true;
     }

@@ -1,4 +1,5 @@
 export enum AdminRoleEnum {
+    SuperAdmin = 'super_admin',
     Admin = 'admin',
 }
 
@@ -21,6 +22,15 @@ export enum CacheTimeEnum {
     OneMonth = 2592000,
 }
 
+export enum DurationFilterEnum {
+    ThisWeek = 'this_week',
+    ThisMonth = 'this_month',
+    ThisYear = 'this_year',
+    LastMonth = 'last_month',
+    SixMonths = '6_months',
+    Today = 'today',
+}
+
 export enum PassportKeyEnum {
-    JwtAuth = 'jwt-auth',
+    AdminAuth = 'admin_auth',
 }
