@@ -3,9 +3,9 @@ import { config } from '../server';
 import httpStatus from 'http-status';
 import { MulterError } from 'multer';
 import { errorLogger } from '../logger';
-import { IErrorMessage } from '../../app/modules';
 import { ResponseInstance } from '../../libs/helper';
 import { ServerEnvironmentEnum } from '../../libs/enum';
+import { IErrorMessage } from '../../app/modules/shared';
 import { ApiError, ErrorHandlerInstance } from './custom.error';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 

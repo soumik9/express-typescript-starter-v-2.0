@@ -27,6 +27,7 @@ const EnvSchema = z.object({
     // URLs
     BASE_URL: requiredString("Base URL is required."),
     CLIENT_BASE_URL: requiredString("Client base URL is required."),
+    BASE_LIVE_URL: requiredString("Base live URL is required."),
 
     // Default Admin
     DEFAULT_ADMIN_EMAIL: requiredString("Default admin email is required."),
@@ -66,6 +67,7 @@ export const config = {
     URL: {
         BASE: parsedConfig.BASE_URL,
         CLIENT: parsedConfig.CLIENT_BASE_URL,
+        BASE_LIVE: parsedConfig.BASE_LIVE_URL,
     },
 
     MAIL: {

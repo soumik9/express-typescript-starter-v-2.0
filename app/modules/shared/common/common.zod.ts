@@ -1,5 +1,5 @@
 import z from "zod";
-import { ZodInstance } from "../../../../libs/helper";
+import { ZodInstance } from "../../../../libs/helper/utils";
 
 // Zod Schema
 export const SendEmailSchema = z.object({

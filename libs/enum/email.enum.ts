@@ -4,4 +4,7 @@ export enum EmailTemplateEnum {
     NotFound = "not_found",
     ForgetVerificationOtp = "forget_verification_otp",
     CacheViewer = "cache_viewer",
+
+    // New email templates
+    InviteNewAdmin = "invite_new_admin",
 }

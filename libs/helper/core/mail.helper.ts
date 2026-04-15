@@ -4,7 +4,7 @@ import httpStatus from "http-status";
 import { ZodInstance } from "../utils";
 import { ServerEnvironmentEnum } from "../../enum";
 import handlebars, { TemplateDelegate } from "handlebars";
-import { ISendEmail, SendEmailSchema } from "../../../app/modules";
+import { ISendEmail, SendEmailSchema } from "../../../app/modules/shared";
 import { config, infoLogger, ApiError, TransporterInstance } from "../../../config";
 
 class EmailService {
@@ -67,7 +67,7 @@ class EmailService {
     }
 
     /** Send email with template rendering */
-    public async sendEmail({
+    public async send({
         payload, useCache = this.useCache }: {
             payload: ISendEmail, useCache?: boolean
         }): Promise<any> {

@@ -1,15 +1,15 @@
+// auth.middleware.ts
 import passport from "passport";
 import httpStatus from "http-status";
 import { ApiError } from "../../config";
 import { PassportKeyEnum } from "../../libs/enum";
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response, RequestHandler } from "express";
 
 class AuthMiddleware {
     private static instance: AuthMiddleware;
 
     private constructor() { }
 
-    /** Singleton accessor */
     public static getInstance(): AuthMiddleware {
         if (!AuthMiddleware.instance) {
             AuthMiddleware.instance = new AuthMiddleware();
@@ -17,14 +17,22 @@ class AuthMiddleware {
         return AuthMiddleware.instance;
     }
 
-    private runPassport(req: Request, res: Response, next: NextFunction, cb: Function) {
+    // Helper to run passport authentication
+    private runPassport(strategies: string[], req: Request, res: Response, next: NextFunction, cb: Function) {
         passport.authenticate(
-            PassportKeyEnum.JwtAuth,
+            strategies,
             { session: false },
-            (err: any, user: any) => {
-                if (err || !user) {
+            (err: any, user: any, info: any) => {
+                // Check for specific strategy errors (e.g., "Tenant database name missing")
+                if (err) {
+                    return next(err);
+                }
+
+                // Check for failed authentication (e.g., Invalid token, User not found)
+                if (!user) {
                     return next(new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized access"));
                 }
+
                 cb(user);
             }
         )(req, res, next);
@@ -32,25 +40,21 @@ class AuthMiddleware {
 
     private checkRoles(requiredRoles: string[], user: any, next: NextFunction) {
         if (requiredRoles.length && !requiredRoles.includes(user.role)) {
-            return next(new ApiError(httpStatus.FORBIDDEN, "Forbidden"));
+            return next(new ApiError(httpStatus.FORBIDDEN, "Forbidden: Insufficient permissions"));
         }
     }
 
-    /**
-     * Main middleware maker
-     */
-    public verify(...requiredRoles: string[]) {
+    // Main verify middleware
+    public verify(authStrategies: PassportKeyEnum[], ...requiredRoles: string[]): RequestHandler {
         return (req: Request, res: Response, next: NextFunction) => {
             try {
-                this.runPassport(req, res, next, (user: any) => {
+                this.runPassport(authStrategies, req, res, next, (user: any) => {
                     this.checkRoles(requiredRoles, user, next);
-
-                    // Normalize into req.admin for backward compatibility
-                    req.admin = {
+                    req.entity = {
                         _id: String(user._id),
+                        name: user.name,
                         email: user.email,
                         role: user.role,
-                        name: user.name,
                     };
 
                     next();
@@ -62,5 +66,4 @@ class AuthMiddleware {
     }
 }
 
-// Export singleton instance
 export const AuthMiddlewareInstance = AuthMiddleware.getInstance();

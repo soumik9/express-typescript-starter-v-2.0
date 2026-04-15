@@ -1,10 +1,12 @@
-export class SharedRegistry {
-    // private static _merchantService: MerchantService;
+import { EmailTemplateService } from "../email";
 
-    // static get merchantService(): MerchantService {
-    //     if (!this._merchantService) {
-    //         this._merchantService = new MerchantService(Merchant);
-    //     }
-    //     return this._merchantService;
-    // }
+export class SharedRegistry {
+    // email template service
+    private static _emailTemplateService: EmailTemplateService;
+    public static get emailTemplateService(): EmailTemplateService {
+        if (!this._emailTemplateService) {
+            this._emailTemplateService = new EmailTemplateService();
+        }
+        return this._emailTemplateService;
+    }
 }

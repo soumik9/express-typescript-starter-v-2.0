@@ -2,11 +2,9 @@ import cors from "cors";
 import moment from "moment";
 import helmet from "helmet";
 import passport from "passport";
-import { PassportKeyEnum } from "../../libs/enum";
 import { ParserInstance } from "../../libs/helper";
 import express, { Application, NextFunction, Request, Response } from "express";
-import { ExtractJwt, Strategy } from "passport-jwt";
-import { config, httpLogger, errorLogger, MulterUploadInstance, FileCompressorInstance, } from "../../config";
+import { config, httpLogger, errorLogger, MulterUploadInstance, FileCompressorInstance, passportInit, } from "../../config";
 
 class ServerMiddlewareService {
     private static instance: ServerMiddlewareService;
@@ -58,20 +56,7 @@ class ServerMiddlewareService {
         app.use(this.handleRequestLog);
         app.use(ParserInstance.body);
 
-        // If strategy should be enabled later, uncomment this block:
-        /*
-        passport.use(
-            PassportKeyEnum.JwtAuth,
-            new Strategy(
-                {
-                    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-                    secretOrKey: config.TOKEN.SECRET,
-                },
-                passportJwtVerify
-            )
-        );
-        */
-
+        passportInit();
         app.use(passport.initialize());
     }
 
@@ -83,7 +68,7 @@ class ServerMiddlewareService {
         res.on("finish", () => {
             const endTime = moment();
             const duration = moment.duration(endTime.diff(startTime)).asMilliseconds();
-            const message = `${method} ${config.URL.BASE + req.originalUrl} ${res.statusCode} - ${duration}ms`;
+            const message = `${method} ${config.URL.BASE + req.originalUrl} ${res.statusCode} - ${duration}ms | ${req.ip}`;
             httpLogger.http(message);
         });
         next();
