@@ -1,4 +1,4 @@
-import { IApiResponseMeta } from "../../../app/modules";
+import { IApiResponseMeta } from "../../../app/modules/shared";
 
 interface IPaginatedProp {
     model: any;

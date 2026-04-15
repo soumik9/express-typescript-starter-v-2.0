@@ -4,7 +4,7 @@ import sharp from 'sharp';
 import fs from 'fs/promises';
 import { randomBytes } from 'crypto';
 import { errorLogger } from '../logger';
-import { IUploadFile } from '../../app/modules';
+import { IUploadFile } from '../../app/modules/shared';
 
 export type FilesObject = {
     [fieldname: string]: IUploadFile[] | undefined;
