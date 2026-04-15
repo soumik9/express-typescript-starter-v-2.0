@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { ZodError } from "zod";
 import { config } from "../server";
 import { errorLogger } from "../logger";
-import { IErrorMessage, IErrorResponse, IGenericErrorMessage, IGenericErrorResponse } from "../../app/modules";
+import { IErrorMessage, IErrorResponse, IGenericErrorMessage, IGenericErrorResponse } from "../../app/modules/shared";
 
 /** Custom API Error Class */
 export class ApiError extends Error {

@@ -1,6 +1,6 @@
 import { config } from "../../../config";
 import { ServerEnvironmentEnum } from "../../enum";
-import { IApiReponse, IErrorResponse } from "../../../app/modules";
+import { IApiReponse, IErrorResponse } from "../../../app/modules/shared";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 
 /**
